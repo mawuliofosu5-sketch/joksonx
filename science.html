@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS Science — Lab & Discovery</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.method-steps { display:flex; flex-direction:column; gap:1rem; max-width:800px; margin:0 auto 3rem; }
+.method-step {
+  display:flex; align-items:flex-start; gap:1.5rem;
+  background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.5rem;
+  position:relative; overflow:hidden; transition:all 0.3s;
+}
+.method-step:hover { border-color:var(--cyan); box-shadow:var(--glow-cyan); transform:translateX(8px); }
+.step-num {
+  font-family:'Orbitron',monospace; font-size:2rem; font-weight:900;
+  color:var(--cyan); text-shadow:var(--glow-cyan); flex-shrink:0; width:50px; text-align:center;
+}
+.step-content h3 { font-family:'Orbitron',monospace; color:var(--cyan); font-size:0.9rem; margin-bottom:0.4rem; }
+.step-content p { font-size:0.88rem; opacity:0.8; line-height:1.6; }
+
+.periodic-mini {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:6px;
+  margin:2rem 0;
+}
+.element {
+  background:var(--card); border:1px solid var(--border); border-radius:8px;
+  padding:8px 6px; text-align:center; cursor:pointer; transition:all 0.2s;
+}
+.element:hover { border-color:var(--cyan); box-shadow:var(--glow-cyan); transform:scale(1.05); }
+.el-num { font-size:0.6rem; color:var(--magenta); }
+.el-sym { font-family:'Orbitron',monospace; font-size:1rem; color:var(--cyan); font-weight:700; }
+.el-name { font-size:0.55rem; opacity:0.6; }
+
+.experiment-card {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:1.5rem; cursor:pointer; transition:all 0.3s;
+}
+.experiment-card:hover { border-color:var(--magenta); box-shadow:var(--glow-mag); }
+.exp-icon { font-size:2rem; margin-bottom:0.8rem; }
+.exp-title { font-family:'Orbitron',monospace; font-size:0.85rem; color:var(--cyan); margin-bottom:0.4rem; }
+.exp-level { font-size:0.7rem; color:var(--neon-green); margin-bottom:0.5rem; }
+.exp-desc { font-size:0.82rem; opacity:0.7; line-height:1.5; }
+
+.sim-canvas { width:100%; height:300px; background:#020408; border:1px solid var(--cyan); border-radius:12px; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html">Gaming</a></li>
+    <li><a href="science.html" class="active">Science</a></li>
+    <li><a href="videos.html">Videos</a></li>
+    <li><a href="movies.html">Movies</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li>
+    <li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html">Earn 💰</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas>
+<div class="cursor"></div><div class="cursor-ring"></div>
+<div class="toast-container"></div>
+
+<div class="page-header">
+  <h1>🔬 SCIENCE LAB</h1>
+  <p>Explore the scientific method, experiments, and the wonders of our universe</p>
+</div>
+
+<div class="section" style="padding-top:0">
+  <!-- SCIENTIFIC METHOD -->
+  <div class="section-title reveal">🧪 THE SCIENTIFIC METHOD</div>
+  <p class="section-sub reveal">The foundation of all scientific discovery</p>
+
+  <div class="method-steps reveal">
+    <div class="method-step"><div class="step-num">1</div><div class="step-content"><h3>🔍 OBSERVATION</h3><p>Observe the world around you. Notice something interesting or puzzling. What do you see? What patterns exist?</p></div></div>
+    <div class="method-step"><div class="step-num">2</div><div class="step-content"><h3>❓ QUESTION</h3><p>Ask a testable question about your observation. A good question is specific, measurable, and answerable through experimentation.</p></div></div>
+    <div class="method-step"><div class="step-num">3</div><div class="step-content"><h3>💡 HYPOTHESIS</h3><p>Form a prediction (educated guess) based on your knowledge. Written as "If _____, then _____, because _____."</p></div></div>
+    <div class="method-step"><div class="step-num">4</div><div class="step-content"><h3>🧫 EXPERIMENT</h3><p>Design and conduct a controlled experiment. Change only one variable at a time (independent variable) and measure the effect (dependent variable).</p></div></div>
+    <div class="method-step"><div class="step-num">5</div><div class="step-content"><h3>📊 ANALYZE DATA</h3><p>Collect and record data. Create graphs and tables. Look for patterns, trends, and relationships in your results.</p></div></div>
+    <div class="method-step"><div class="step-num">6</div><div class="step-content"><h3>✅ CONCLUSION</h3><p>Did your results support your hypothesis? What did you learn? How can this knowledge be applied or investigated further?</p></div></div>
+  </div>
+
+  <!-- PERIODIC TABLE MINI -->
+  <div class="section-title reveal" style="margin-top:2rem;">⚗️ PERIODIC TABLE</div>
+  <p class="section-sub reveal">Click an element to learn more!</p>
+  <div class="periodic-mini reveal" id="periodic"></div>
+
+  <!-- PARTICLE SIM -->
+  <div style="margin:2rem 0;" class="reveal">
+    <div class="section-title" style="margin-bottom:1rem;">⚛️ PARTICLE SIMULATION</div>
+    <canvas class="sim-canvas" id="sim-canvas"></canvas>
+    <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="addParticles()">ADD PARTICLES</button>
+      <button class="btn btn-outline" onclick="clearParticles()">CLEAR</button>
+      <button class="btn btn-outline" onclick="toggleGravity()">TOGGLE GRAVITY</button>
+    </div>
+  </div>
+
+  <!-- EXPERIMENTS -->
+  <div class="section-title reveal" style="margin-top:2rem;">🧪 VIRTUAL EXPERIMENTS</div>
+  <p class="section-sub reveal">AI-powered science experiments you can try at home</p>
+  <div class="grid reveal">
+    <div class="experiment-card" onclick="loadExperiment('volcano')">
+      <div class="exp-icon">🌋</div>
+      <div class="exp-title">BAKING SODA VOLCANO</div>
+      <div class="exp-level">⭐ BEGINNER</div>
+      <div class="exp-desc">Classic acid-base reaction that creates a foam eruption! Learn about chemical reactions.</div>
+    </div>
+    <div class="experiment-card" onclick="loadExperiment('rainbow')">
+      <div class="exp-icon">🌈</div>
+      <div class="exp-title">LIGHT SPECTRUM</div>
+      <div class="exp-level">⭐⭐ INTERMEDIATE</div>
+      <div class="exp-desc">Split white light into a rainbow using a prism or water to understand light wavelengths.</div>
+    </div>
+    <div class="experiment-card" onclick="loadExperiment('dna')">
+      <div class="exp-icon">🧬</div>
+      <div class="exp-title">DNA EXTRACTION</div>
+      <div class="exp-level">⭐⭐⭐ ADVANCED</div>
+      <div class="exp-desc">Extract real DNA from a strawberry using household materials!</div>
+    </div>
+    <div class="experiment-card" onclick="loadExperiment('electro')">
+      <div class="exp-icon">⚡</div>
+      <div class="exp-title">STATIC ELECTRICITY</div>
+      <div class="exp-level">⭐ BEGINNER</div>
+      <div class="exp-desc">Explore electric charges and how opposite charges attract each other.</div>
+    </div>
+    <div class="experiment-card" onclick="loadExperiment('greenhouse')">
+      <div class="exp-icon">🌿</div>
+      <div class="exp-title">GREENHOUSE EFFECT</div>
+      <div class="exp-level">⭐⭐ INTERMEDIATE</div>
+      <div class="exp-desc">Model global warming with two bottles and measure temperature differences.</div>
+    </div>
+    <div class="experiment-card" onclick="loadExperiment('pendulum')">
+      <div class="exp-icon">⏰</div>
+      <div class="exp-title">PENDULUM PHYSICS</div>
+      <div class="exp-level">⭐⭐ INTERMEDIATE</div>
+      <div class="exp-desc">Discover how length affects the period of a pendulum swing.</div>
+    </div>
+  </div>
+
+  <!-- EXPERIMENT RESULT -->
+  <div id="exp-result" style="display:none;margin-top:2rem;" class="ai-tutor-box">
+    <div class="ai-tutor-title">🤖 AI EXPERIMENT GUIDE</div>
+    <div id="exp-content"></div>
+  </div>
+
+  <!-- AI SCIENCE ASK -->
+  <div class="ai-tutor-box reveal" style="margin-top:2rem;">
+    <div class="ai-tutor-title">🔬 ASK THE SCIENCE AI</div>
+    <div id="sci-messages" style="max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:0.7rem;margin-bottom:1rem;">
+      <div class="msg ai">I'm your Science AI! Ask me about any scientific topic — biology, chemistry, physics, astronomy, or anything you're curious about!</div>
+    </div>
+    <div class="tutor-input-row" style="display:flex;gap:0.5rem;">
+      <input id="sci-input" class="tutor-input" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:0.9rem;padding:10px 14px;outline:none;" placeholder="e.g. How do black holes form?"/>
+      <button class="btn btn-primary" onclick="askScience()">ASK</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6</div>
+</footer>
+
+
+
+<!-- ELEMENT MODAL -->
+<div class="modal-overlay" id="element-modal">
+  <div class="modal-box" style="position:relative;">
+    <button class="modal-close" onclick="document.getElementById('element-modal').classList.remove('open')">✕</button>
+    <div class="modal-title" id="el-modal-title"></div>
+    <div id="el-modal-content"></div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+// PERIODIC TABLE DATA
+const elements=[
+  {n:1,sym:'H',name:'Hydrogen',cat:'nonmetal',mass:'1.008'},
+  {n:2,sym:'He',name:'Helium',cat:'noble gas',mass:'4.003'},
+  {n:3,sym:'Li',name:'Lithium',cat:'alkali metal',mass:'6.941'},
+  {n:4,sym:'Be',name:'Beryllium',cat:'alkaline',mass:'9.012'},
+  {n:5,sym:'B',name:'Boron',cat:'metalloid',mass:'10.81'},
+  {n:6,sym:'C',name:'Carbon',cat:'nonmetal',mass:'12.01'},
+  {n:7,sym:'N',name:'Nitrogen',cat:'nonmetal',mass:'14.01'},
+  {n:8,sym:'O',name:'Oxygen',cat:'nonmetal',mass:'16.00'},
+  {n:9,sym:'F',name:'Fluorine',cat:'halogen',mass:'19.00'},
+  {n:10,sym:'Ne',name:'Neon',cat:'noble gas',mass:'20.18'},
+  {n:11,sym:'Na',name:'Sodium',cat:'alkali metal',mass:'22.99'},
+  {n:12,sym:'Mg',name:'Magnesium',cat:'alkaline',mass:'24.31'},
+  {n:13,sym:'Al',name:'Aluminum',cat:'metal',mass:'26.98'},
+  {n:14,sym:'Si',name:'Silicon',cat:'metalloid',mass:'28.09'},
+  {n:15,sym:'P',name:'Phosphorus',cat:'nonmetal',mass:'30.97'},
+  {n:16,sym:'S',name:'Sulfur',cat:'nonmetal',mass:'32.07'},
+  {n:17,sym:'Cl',name:'Chlorine',cat:'halogen',mass:'35.45'},
+  {n:18,sym:'Ar',name:'Argon',cat:'noble gas',mass:'39.95'},
+  {n:19,sym:'K',name:'Potassium',cat:'alkali metal',mass:'39.10'},
+  {n:20,sym:'Ca',name:'Calcium',cat:'alkaline',mass:'40.08'},
+  {n:26,sym:'Fe',name:'Iron',cat:'metal',mass:'55.85'},
+  {n:29,sym:'Cu',name:'Copper',cat:'metal',mass:'63.55'},
+  {n:47,sym:'Ag',name:'Silver',cat:'metal',mass:'107.9'},
+  {n:79,sym:'Au',name:'Gold',cat:'metal',mass:'197.0'},
+];
+
+const catColors = {'nonmetal':'#00f5ff','noble gas':'#ff00ff','alkali metal':'#ffd700','alkaline':'#39ff14','metalloid':'#ff8800','metal':'#8888ff','halogen':'#ff4488'};
+
+const periodic = document.getElementById('periodic');
+elements.forEach(el => {
+  const d = document.createElement('div');
+  d.className = 'element';
+  d.style.borderColor = catColors[el.cat]||'var(--border)';
+  d.innerHTML = `<div class="el-num">${el.n}</div><div class="el-sym" style="color:${catColors[el.cat]||'var(--cyan)'}">${el.sym}</div><div class="el-name">${el.name}</div>`;
+  d.onclick = () => showElement(el);
+  periodic.appendChild(d);
+});
+
+async function showElement(el) {
+  document.getElementById('element-modal').classList.add('open');
+  document.getElementById('el-modal-title').textContent = `${el.sym} — ${el.name}`;
+  document.getElementById('el-modal-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0;">
+      <div class="stat-box"><div class="stat-num" style="font-size:1.2rem;">${el.n}</div><div class="stat-label">ATOMIC NUMBER</div></div>
+      <div class="stat-box"><div class="stat-num" style="font-size:1.2rem;">${el.mass}</div><div class="stat-label">ATOMIC MASS</div></div>
+    </div>
+    <div class="tag tag-cyan">${el.cat}</div>
+    <div style="margin-top:1rem;"><span class="spinner"></span> Loading AI description...</div>
+  `;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        system:'You are a science educator. Give a brief, engaging fact about a chemical element in 2-3 sentences. Include one fun fact. Use emojis.',
+        messages:[{role:'user',content:`Tell me about the element ${el.name} (${el.sym})`}]
+      })
+    });
+    const data = await res.json();
+    const info = document.getElementById('el-modal-content');
+    info.querySelector('div:last-child').innerHTML = `<div class="ai-answer" style="margin-top:1rem;">${data.content?.[0]?.text||''}</div>`;
+  } catch(e) {}
+}
+
+// PARTICLE SIM
+const simCanvas = document.getElementById('sim-canvas');
+const simCtx = simCanvas.getContext('2d');
+simCanvas.width = simCanvas.offsetWidth;
+simCanvas.height = 300;
+let particles=[], gravity=false;
+
+function addParticles() {
+  for(let i=0;i<15;i++) {
+    particles.push({
+      x:Math.random()*simCanvas.width, y:Math.random()*simCanvas.height/2,
+      vx:(Math.random()-0.5)*4, vy:(Math.random()-0.5)*4,
+      r:Math.random()*8+3, color:`hsl(${Math.random()*360},100%,60%)`,
+      life:1
+    });
+  }
+  toast('Particles added!');
+}
+function clearParticles() { particles=[]; toast('Cleared!'); }
+function toggleGravity() { gravity=!gravity; toast(gravity?'Gravity ON':'Gravity OFF'); }
+
+function drawSim() {
+  simCtx.fillStyle='rgba(2,4,8,0.2)'; simCtx.fillRect(0,0,simCanvas.width,300);
+  particles.forEach((p,i) => {
+    if(gravity) p.vy+=0.1;
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<p.r||p.x>simCanvas.width-p.r) p.vx*=-0.9;
+    if(p.y<p.r||p.y>300-p.r) { p.vy*=-0.85; p.y=Math.min(Math.max(p.r,p.y),300-p.r); }
+    simCtx.beginPath(); simCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    simCtx.fillStyle=p.color; simCtx.shadowColor=p.color; simCtx.shadowBlur=10;
+    simCtx.fill(); simCtx.shadowBlur=0;
+    // Connections
+    particles.forEach((q,j) => {
+      if(j<=i) return;
+      const d=Math.hypot(p.x-q.x,p.y-q.y);
+      if(d<80) { simCtx.strokeStyle=`rgba(0,245,255,${0.3*(1-d/80)})`; simCtx.lineWidth=0.5; simCtx.beginPath(); simCtx.moveTo(p.x,p.y); simCtx.lineTo(q.x,q.y); simCtx.stroke(); }
+    });
+  });
+  requestAnimationFrame(drawSim);
+}
+addParticles(); drawSim();
+
+// EXPERIMENT LOADER
+async function loadExperiment(name) {
+  document.getElementById('exp-result').style.display='block';
+  document.getElementById('exp-content').innerHTML='<span class="spinner"></span> Loading experiment guide...';
+  document.getElementById('exp-result').scrollIntoView({behavior:'smooth'});
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        system:'You are a science teacher. Provide a clear, step-by-step guide for a science experiment including: what you need, steps, safety tips, and the science behind it. Use emojis and make it engaging for students.',
+        messages:[{role:'user',content:`Give me a complete guide for the "${name}" science experiment`}]
+      })
+    });
+    const data = await res.json();
+    document.getElementById('exp-content').innerHTML = (data.content?.[0]?.text||'').replace(/\n/g,'<br>');
+  } catch(e) { document.getElementById('exp-content').textContent='Error loading experiment.'; }
+}
+
+// SCIENCE AI
+async function askScience() {
+  const inp = document.getElementById('sci-input');
+  const msgs = document.getElementById('sci-messages');
+  const q = inp.value.trim(); if(!q) return;
+  inp.value='';
+  const ud=document.createElement('div'); ud.className='msg user'; ud.textContent=q; msgs.appendChild(ud);
+  const ad=document.createElement('div'); ad.className='msg ai'; ad.textContent='⏳ Researching...'; msgs.appendChild(ad);
+  msgs.scrollTop=msgs.scrollHeight;
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are an expert science communicator. Answer questions clearly, use real science, and make it fascinating. Use emojis.',messages:[{role:'user',content:q}]})});
+    const data=await res.json();
+    ad.textContent=data.content?.[0]?.text||'No response.';
+  } catch(e){ad.textContent='Error.';} msgs.scrollTop=msgs.scrollHeight;
+}
+document.getElementById('sci-input').addEventListener('keydown',e=>{if(e.key==='Enter')askScience();});
+</script>
+
+<!-- NEXUS AD SCRIPTS -->
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="https://pl29119943.profitablecpmratenetwork.com/95/36/71/953671a9b1c1310473849544757c959e.js"></script>
+<script src="https://pl29119946.profitablecpmratenetwork.com/4e/c2/c8/4ec2c859136af96e53357bc9a21d1063.js"></script>
+<script async data-cfasync="false" src="https://pl29072711.profitablecpmratenetwork.com/fe2c19526de3ee03ac6f5077ca63cdaa/invoke.js"></script>
+
+<script src="js/premium.js"></script>
+</body>
+</html>

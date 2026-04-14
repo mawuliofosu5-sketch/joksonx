@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS Premium — Unlock Everything</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.hero-prem{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:90px 2rem 3rem;position:relative;z-index:2;text-align:center;}
+.prem-title{font-family:'Orbitron',monospace;font-size:clamp(2rem,5vw,4rem);font-weight:900;background:linear-gradient(135deg,#ffd700,#ff8800,#ff00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1rem;animation:gradient-shift 3s ease infinite;background-size:200%;}
+@keyframes gradient-shift{0%,100%{background-position:0%;}50%{background-position:100%;}}
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.5rem;max-width:1000px;margin:0 auto;}
+.plan-card{background:var(--card);border:2px solid var(--border);border-radius:24px;padding:2rem;text-align:center;transition:all 0.3s;position:relative;overflow:hidden;cursor:pointer;}
+.plan-card:hover{transform:translateY(-10px);}
+.plan-card.featured{border-color:var(--gold);box-shadow:0 0 50px rgba(255,215,0,0.3);}
+.plan-card.featured:hover{box-shadow:0 0 80px rgba(255,215,0,0.5);}
+.plan-name{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;margin-bottom:0.5rem;}
+.plan-price-big{font-family:'Orbitron',monospace;font-size:3.5rem;font-weight:900;}
+.plan-duration{font-size:0.75rem;opacity:0.5;margin-bottom:1.5rem;}
+.plan-feature-list{list-style:none;text-align:left;margin:1rem 0 1.5rem;font-size:0.85rem;}
+.plan-feature-list li{padding:7px 0;border-bottom:1px solid rgba(0,245,255,0.07);}
+.plan-feature-list li.yes::before{content:'✅ ';}
+.plan-feature-list li.no::before{content:'❌ ';opacity:0.4;}
+.plan-feature-list li.no{opacity:0.4;}
+.compare-table{max-width:900px;margin:3rem auto;border-radius:16px;overflow:hidden;border:1px solid var(--border);}
+.compare-table table{width:100%;border-collapse:collapse;}
+.compare-table th{background:rgba(0,245,255,0.06);font-family:'Orbitron',monospace;font-size:0.72rem;letter-spacing:1px;padding:12px 16px;text-align:center;border-bottom:1px solid var(--border);}
+.compare-table td{padding:10px 16px;text-align:center;font-size:0.85rem;border-bottom:1px solid rgba(0,245,255,0.06);}
+.compare-table tr:hover td{background:rgba(0,245,255,0.03);}
+.faq-item{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:0.8rem;overflow:hidden;}
+.faq-q{padding:1rem 1.2rem;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.8rem;display:flex;justify-content:space-between;align-items:center;}
+.faq-q:hover{background:rgba(0,245,255,0.04);}
+.faq-a{padding:0 1.2rem 1rem;font-size:0.85rem;opacity:0.8;line-height:1.7;display:none;}
+.faq-a.open{display:block;}
+.prem-current{background:rgba(57,255,20,0.08);border:2px solid var(--neon-green);border-radius:16px;padding:1.5rem;text-align:center;margin-bottom:2rem;}
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas><div class="cursor"></div><div class="cursor-ring"></div><div class="toast-container"></div>
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="earn.html">Earn 💰</a></li>
+    <li><a href="gaming.html">Gaming</a></li><li><a href="ai-tools.html">AI Tools</a></li>
+    <li><a href="chat.html">Chat</a></li><li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+
+<div class="hero-prem">
+  <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--gold);border:1px solid var(--gold);padding:4px 16px;border-radius:20px;margin-bottom:1.5rem;animation:pulse-green 2s infinite;">⭐ NEXUS PREMIUM MEMBERSHIP</div>
+  <h1 class="prem-title">UNLOCK EVERYTHING</h1>
+  <p style="font-size:1.15rem;color:rgba(200,230,240,0.7);max-width:600px;margin-bottom:3rem;line-height:1.7;">Go unlimited. Earn 5x faster. Access every feature. Premium members mine more, win more, and unlock the full NEXUS experience.</p>
+
+  <!-- Current status -->
+  <div id="current-status" style="max-width:400px;width:100%;margin-bottom:2rem;"></div>
+</div>
+
+<div class="section" style="padding-top:0">
+
+  <!-- PLANS -->
+  <div class="section-title">💎 CHOOSE YOUR PLAN</div>
+  <p class="section-sub" style="margin-bottom:2rem;">All plans include instant feature unlock. Premium members earn more on every activity.</p>
+
+  <div class="plans-grid reveal">
+
+    <div class="plan-card" onclick="selectPlan('BASIC','5.00')">
+      <div class="plan-name" style="color:var(--cyan);">🔵 BASIC</div>
+      <div class="plan-price-big" style="background:linear-gradient(135deg,var(--cyan),#0080ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">$5</div>
+      <div class="plan-duration">per 30 days</div>
+      <ul class="plan-feature-list">
+        <li class="yes">Ad-free browsing</li>
+        <li class="yes">8 AI queries per day</li>
+        <li class="yes">1.5x mining speed boost</li>
+        <li class="yes">Priority chat features</li>
+        <li class="yes">Basic member badge</li>
+        <li class="no">Unlimited AI queries</li>
+        <li class="no">Quantum/Galaxy Miner</li>
+        <li class="no">5x mining speed</li>
+      </ul>
+      <button class="btn btn-outline" style="width:100%;border-color:var(--cyan);color:var(--cyan);">GET BASIC</button>
+    </div>
+
+    <div class="plan-card featured" onclick="selectPlan('PRO','15.00')">
+      <div style="position:absolute;top:0;right:0;background:linear-gradient(135deg,var(--gold),#ff8800);color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;padding:6px 16px;border-radius:0 24px 0 12px;font-weight:900;">🔥 MOST POPULAR</div>
+      <div class="plan-name" style="color:var(--gold);">⭐ PRO</div>
+      <div class="plan-price-big" style="background:linear-gradient(135deg,var(--gold),#ff8800);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">$15</div>
+      <div class="plan-duration">per 30 days</div>
+      <ul class="plan-feature-list">
+        <li class="yes">Everything in Basic</li>
+        <li class="yes">Unlimited AI queries</li>
+        <li class="yes">2x mining speed boost</li>
+        <li class="yes">Quantum Miner access</li>
+        <li class="yes">Spin wheel every 2hrs</li>
+        <li class="yes">$50 min withdrawal</li>
+        <li class="yes">Gold profile badge</li>
+        <li class="no">5x mining speed</li>
+      </ul>
+      <button class="btn btn-gold" style="width:100%;">GET PRO — BEST VALUE</button>
+    </div>
+
+    <div class="plan-card" style="border-color:rgba(255,0,255,0.5);" onclick="selectPlan('ELITE','30.00')">
+      <div class="plan-name" style="color:var(--magenta);">💎 ELITE</div>
+      <div class="plan-price-big" style="background:linear-gradient(135deg,var(--magenta),#8800ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">$30</div>
+      <div class="plan-duration">per 30 days</div>
+      <ul class="plan-feature-list">
+        <li class="yes">Everything in Pro</li>
+        <li class="yes">3x mining speed boost</li>
+        <li class="yes">Galaxy Miner access</li>
+        <li class="yes">VIP withdrawal priority</li>
+        <li class="yes">Gold profile frame</li>
+        <li class="yes">Early feature access</li>
+        <li class="yes">Dedicated support</li>
+        <li class="no">5x mining speed</li>
+      </ul>
+      <button class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,var(--magenta),#8800ff);color:#fff;">GET ELITE</button>
+    </div>
+
+    <div class="plan-card" style="border-color:var(--gold);background:linear-gradient(135deg,rgba(255,215,0,0.06),rgba(255,136,0,0.04));" onclick="selectPlan('LIFETIME','50.00')">
+      <div style="position:absolute;top:0;left:0;background:linear-gradient(135deg,#39ff14,#00f5ff);color:#000;font-family:'Orbitron',monospace;font-size:0.6rem;padding:6px 16px;border-radius:24px 0 12px 0;font-weight:900;">♾️ FOREVER</div>
+      <div class="plan-name" style="color:var(--gold);">🏆 LIFETIME</div>
+      <div class="plan-price-big" style="background:linear-gradient(135deg,var(--gold),#ff8800,#ff00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">$50</div>
+      <div class="plan-duration">one-time payment · forever</div>
+      <ul class="plan-feature-list">
+        <li class="yes"><strong>EVERYTHING FOREVER</strong></li>
+        <li class="yes">5x mining speed</li>
+        <li class="yes">Master Miner access</li>
+        <li class="yes">All future features</li>
+        <li class="yes">Legendary rank badge</li>
+        <li class="yes">Beta tester access</li>
+        <li class="yes">Direct creator contact</li>
+        <li class="yes">Instant withdrawals</li>
+      </ul>
+      <button class="btn btn-gold" style="width:100%;">GET LIFETIME — FOREVER</button>
+    </div>
+  </div>
+
+  <!-- COMPARISON TABLE -->
+  <div style="margin-top:4rem;" class="reveal">
+    <div class="section-title">📊 PLAN COMPARISON</div>
+    <div class="compare-table" style="margin-top:1.5rem;overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left;">FEATURE</th>
+            <th>FREE</th>
+            <th style="color:var(--cyan);">BASIC</th>
+            <th style="color:var(--gold);">PRO ⭐</th>
+            <th style="color:var(--magenta);">ELITE</th>
+            <th style="color:var(--gold);">LIFETIME</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="text-align:left;">Mining Multiplier</td><td>1x</td><td style="color:var(--cyan);">1.5x</td><td style="color:var(--gold);">2x</td><td style="color:var(--magenta);">3x</td><td style="color:var(--gold);">5x</td></tr>
+          <tr><td style="text-align:left;">AI Queries/Day</td><td>3</td><td style="color:var(--cyan);">8</td><td style="color:var(--gold);">∞</td><td style="color:var(--magenta);">∞</td><td style="color:var(--gold);">∞</td></tr>
+          <tr><td style="text-align:left;">Spin Wheel Cooldown</td><td>4 hrs</td><td style="color:var(--cyan);">3 hrs</td><td style="color:var(--gold);">2 hrs</td><td style="color:var(--magenta);">2 hrs</td><td style="color:var(--gold);">1 hr</td></tr>
+          <tr><td style="text-align:left;">Min. Withdrawal</td><td>$100</td><td style="color:var(--cyan);">$75</td><td style="color:var(--gold);">$50</td><td style="color:var(--magenta);">$50</td><td style="color:var(--gold);">$25</td></tr>
+          <tr><td style="text-align:left;">Quantum Miner</td><td>❌</td><td>❌</td><td style="color:var(--neon-green);">✅</td><td style="color:var(--neon-green);">✅</td><td style="color:var(--neon-green);">✅</td></tr>
+          <tr><td style="text-align:left;">Galaxy Miner</td><td>❌</td><td>❌</td><td>❌</td><td style="color:var(--neon-green);">✅</td><td style="color:var(--neon-green);">✅</td></tr>
+          <tr><td style="text-align:left;">Master Miner</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td style="color:var(--neon-green);">✅</td></tr>
+          <tr><td style="text-align:left;">Ad-Free</td><td>❌</td><td style="color:var(--neon-green);">✅</td><td style="color:var(--neon-green);">✅</td><td style="color:var(--neon-green);">✅</td><td style="color:var(--neon-green);">✅</td></tr>
+          <tr><td style="text-align:left;">Profile Badge</td><td>None</td><td style="color:var(--cyan);">Basic</td><td style="color:var(--gold);">Gold</td><td style="color:var(--magenta);">Elite</td><td style="color:var(--gold);">Legendary</td></tr>
+          <tr><td style="text-align:left;">Premium Games</td><td>❌</td><td>❌</td><td style="color:var(--neon-green);">✅</td><td style="color:var(--neon-green);">✅</td><td style="color:var(--neon-green);">✅</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div style="max-width:700px;margin:4rem auto;" class="reveal">
+    <div class="section-title">❓ FAQ</div>
+    <div style="margin-top:1.5rem;">
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><span>How do I pay for Premium?</span><span>+</span></div><div class="faq-a">Click your chosen plan, then click "Reveal Payment Number" to get the MTN MoMo number. Send the exact amount and submit your transaction ID. Your premium activates within 1–24 hours after verification.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><span>How does the mining multiplier work?</span><span>+</span></div><div class="faq-a">With a 2x multiplier (PRO), every $1 your miner earns becomes $2 automatically. With 5x (LIFETIME), every click and every machine earns 5x more — it applies to all earning activities.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><span>Can I upgrade my plan later?</span><span>+</span></div><div class="faq-a">Yes! You can upgrade to any higher tier at any time. Your remaining days from your current plan carry over. The Lifetime plan is the best value as it never expires.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><span>Is there a free trial?</span><span>+</span></div><div class="faq-a">The free tier gives you access to basic features, ads, and the standard miners. Premium unlocks the multiplier, unlimited AI, and exclusive machines. The BASIC plan at $5/month is the most affordable entry point.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)"><span>What is the Lifetime plan?</span><span>+</span></div><div class="faq-a">Pay once ($50) and get EVERY premium feature forever — including all future features added to NEXUS. This is the absolute best value and includes the exclusive Master Miner, 5x multiplier, and legendary profile rank.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<footer><div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6 — AGE 15 | ALL RIGHTS RESERVED</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script src="js/premium.js"></script>
+<script>
+function toggleFAQ(el){
+  const a=el.nextElementSibling;
+  const isOpen=a.classList.contains('open');
+  document.querySelectorAll('.faq-a').forEach(x=>x.classList.remove('open'));
+  document.querySelectorAll('.faq-q span:last-child').forEach(x=>x.textContent='+');
+  if(!isOpen){a.classList.add('open');el.querySelector('span:last-child').textContent='−';}
+}
+
+// Show current status
+document.addEventListener('DOMContentLoaded',()=>{
+  const status=document.getElementById('current-status');
+  if(!status)return;
+  if(typeof NEXUS_PREMIUM!=='undefined'&&NEXUS_PREMIUM.isPremium()){
+    status.innerHTML=`<div class="prem-current"><div style="font-family:'Orbitron',monospace;color:var(--neon-green);font-size:1rem;">✅ YOU ARE PREMIUM</div><div style="margin-top:0.3rem;opacity:0.7;">Plan: <strong>${NEXUS_PREMIUM.getTier()}</strong> · ${NEXUS_PREMIUM.daysLeft()} days remaining · ${NEXUS_PREMIUM.getMiningMultiplier()}x multiplier active</div><a href="earn.html" class="btn btn-gold" style="display:inline-block;margin-top:0.8rem;text-decoration:none;font-size:0.75rem;">💰 GO EARN →</a></div>`;
+  }
+});
+</script>
+</body>
+</html>

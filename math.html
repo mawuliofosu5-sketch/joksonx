@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS Math Lab</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;max-width:320px;}
+.calc-btn{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;font-family:'Orbitron',monospace;font-size:1rem;color:var(--text);cursor:pointer;transition:all 0.2s;}
+.calc-btn:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:var(--glow-cyan);}
+.calc-btn.op{color:var(--magenta);}
+.calc-btn.eq{background:linear-gradient(135deg,var(--cyan),var(--magenta));color:#000;border:none;}
+.calc-btn.clear{color:#ff4444;}
+.calc-display{background:#010a12;border:1px solid var(--cyan);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;max-width:320px;}
+.calc-expr{font-size:0.75rem;color:rgba(200,230,240,0.5);font-family:'Share Tech Mono',monospace;min-height:1.2em;}
+.calc-result{font-family:'Orbitron',monospace;font-size:2rem;color:var(--cyan);text-align:right;text-shadow:var(--glow-cyan);}
+.graph-canvas{width:100%;height:300px;background:#010a12;border:1px solid var(--cyan);border-radius:12px;}
+.formula-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;cursor:pointer;transition:all 0.2s;}
+.formula-card:hover{border-color:var(--cyan);}
+.formula-name{font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--cyan);margin-bottom:0.3rem;}
+.formula-eq{font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:var(--magenta);}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html">Gaming</a></li><li><a href="science.html">Science</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li><li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html">Earn 💰</a></li><li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas><div class="cursor"></div><div class="cursor-ring"></div><div class="toast-container"></div>
+<div class="page-header"><h1>🧮 MATH LAB</h1><p>Calculator, graphing, formulas, and AI math help</p></div>
+<div class="section" style="padding-top:0">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;" class="reveal">
+    <!-- CALCULATOR -->
+    <div>
+      <div class="section-title" style="font-size:1rem;margin-bottom:1rem;">🔢 CALCULATOR</div>
+      <div class="calc-display">
+        <div class="calc-expr" id="calc-expr"></div>
+        <div class="calc-result" id="calc-result">0</div>
+      </div>
+      <div class="calc-grid">
+        <button class="calc-btn clear" onclick="calcClear()">C</button>
+        <button class="calc-btn op" onclick="calcInput('(')">(</button>
+        <button class="calc-btn op" onclick="calcInput(')')">)</button>
+        <button class="calc-btn op" onclick="calcInput('/')">÷</button>
+        <button class="calc-btn" onclick="calcInput('7')">7</button>
+        <button class="calc-btn" onclick="calcInput('8')">8</button>
+        <button class="calc-btn" onclick="calcInput('9')">9</button>
+        <button class="calc-btn op" onclick="calcInput('*')">×</button>
+        <button class="calc-btn" onclick="calcInput('4')">4</button>
+        <button class="calc-btn" onclick="calcInput('5')">5</button>
+        <button class="calc-btn" onclick="calcInput('6')">6</button>
+        <button class="calc-btn op" onclick="calcInput('-')">−</button>
+        <button class="calc-btn" onclick="calcInput('1')">1</button>
+        <button class="calc-btn" onclick="calcInput('2')">2</button>
+        <button class="calc-btn" onclick="calcInput('3')">3</button>
+        <button class="calc-btn op" onclick="calcInput('+')">+</button>
+        <button class="calc-btn" onclick="calcInput('0')" style="grid-column:span 2">0</button>
+        <button class="calc-btn" onclick="calcInput('.')">.</button>
+        <button class="calc-btn eq" onclick="calcEval()">=</button>
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;">
+        <button class="calc-btn op" onclick="calcInput('Math.sqrt(')">√</button>
+        <button class="calc-btn op" onclick="calcInput('**2')" style="font-size:0.7rem;">x²</button>
+        <button class="calc-btn op" onclick="calcInput('Math.PI')" style="font-size:0.7rem;">π</button>
+        <button class="calc-btn op" onclick="calcInput('Math.sin(')" style="font-size:0.7rem;">sin</button>
+        <button class="calc-btn op" onclick="calcInput('Math.cos(')" style="font-size:0.7rem;">cos</button>
+        <button class="calc-btn op" onclick="calcInput('Math.log(')" style="font-size:0.7rem;">log</button>
+      </div>
+    </div>
+    <!-- GRAPH -->
+    <div>
+      <div class="section-title" style="font-size:1rem;margin-bottom:1rem;">📈 GRAPH VISUALIZER</div>
+      <div class="field"><label>FUNCTION (use x)</label><input type="text" id="graph-fn" value="Math.sin(x)" placeholder="e.g. x*x, Math.sin(x)..."/></div>
+      <button class="btn btn-primary" onclick="drawGraph()" style="margin-bottom:0.8rem;">📈 DRAW</button>
+      <canvas class="graph-canvas" id="graph-canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- FORMULAS -->
+  <div class="section-title reveal" style="margin-top:2rem;">📐 KEY FORMULAS</div>
+  <div class="grid reveal">
+    <div class="formula-card" onclick="explainFormula('Pythagorean theorem')"><div class="formula-name">PYTHAGOREAN THEOREM</div><div class="formula-eq">a² + b² = c²</div></div>
+    <div class="formula-card" onclick="explainFormula('quadratic formula')"><div class="formula-name">QUADRATIC FORMULA</div><div class="formula-eq">x = (-b ± √(b²-4ac)) / 2a</div></div>
+    <div class="formula-card" onclick="explainFormula('area of circle')"><div class="formula-name">AREA OF CIRCLE</div><div class="formula-eq">A = πr²</div></div>
+    <div class="formula-card" onclick="explainFormula('slope formula')"><div class="formula-name">SLOPE FORMULA</div><div class="formula-eq">m = (y₂-y₁)/(x₂-x₁)</div></div>
+    <div class="formula-card" onclick="explainFormula('compound interest')"><div class="formula-name">COMPOUND INTEREST</div><div class="formula-eq">A = P(1 + r/n)^(nt)</div></div>
+    <div class="formula-card" onclick="explainFormula('law of sines')"><div class="formula-name">LAW OF SINES</div><div class="formula-eq">a/sinA = b/sinB = c/sinC</div></div>
+  </div>
+  <div id="formula-ai" class="ai-answer reveal" style="display:none;margin-top:1rem;max-width:600px;"></div>
+
+  <!-- AI MATH HELP -->
+  <div class="ai-tutor-box reveal" style="margin-top:2rem;">
+    <div class="ai-tutor-title">🤖 AI MATH TUTOR</div>
+    <div style="display:flex;gap:0.5rem;">
+      <input id="math-ai-inp" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:0.9rem;padding:10px 14px;outline:none;" placeholder="Type any math problem..."/>
+      <button class="btn btn-primary" onclick="askMathAI()">SOLVE</button>
+    </div>
+    <div id="math-ai-out" class="ai-output" style="display:none;margin-top:0.8rem;"></div>
+  </div>
+</div>
+<footer><div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+let calcExpr='';
+function calcInput(v){calcExpr+=v;document.getElementById('calc-expr').textContent=calcExpr;try{document.getElementById('calc-result').textContent=eval(calcExpr);}catch(e){}}
+function calcClear(){calcExpr='';document.getElementById('calc-expr').textContent='';document.getElementById('calc-result').textContent='0';}
+function calcEval(){try{const r=eval(calcExpr);document.getElementById('calc-result').textContent=r;calcExpr=String(r);}catch(e){document.getElementById('calc-result').textContent='ERROR';calcExpr='';}}
+
+function drawGraph(){
+  const canvas=document.getElementById('graph-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth;canvas.height=300;
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,scale=40;
+  ctx.fillStyle='#010a12';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(0,245,255,0.1)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=scale){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=scale){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.strokeStyle='rgba(0,245,255,0.4)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,H);ctx.stroke();
+  const fn=document.getElementById('graph-fn').value;
+  ctx.strokeStyle='#ff00ff';ctx.shadowColor='#ff00ff';ctx.shadowBlur=6;ctx.lineWidth=2.5;
+  ctx.beginPath();let started=false;
+  for(let px=0;px<W;px++){
+    const x=(px-cx)/scale;
+    try{const y=eval(fn);const py=cy-y*scale;if(!started){ctx.moveTo(px,py);started=true;}else{ctx.lineTo(px,py);}}catch(e){}
+  }
+  ctx.stroke();ctx.shadowBlur=0;toast('Graph drawn!','success');
+}
+
+async function explainFormula(name){
+  const out=document.getElementById('formula-ai');out.style.display='block';out.innerHTML='<span class="spinner"></span>';
+  try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are a math teacher. Explain formulas clearly with examples for Grade 6-12 students. Use emojis.',messages:[{role:'user',content:`Explain the ${name} with a worked example`}]})});const data=await res.json();out.textContent=data.content?.[0]?.text||'';}catch(e){out.textContent='Error.';}
+}
+
+async function askMathAI(){const q=document.getElementById('math-ai-inp').value.trim();if(!q)return;const out=document.getElementById('math-ai-out');out.style.display='block';out.innerHTML='<span class="spinner"></span>';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are an expert math tutor. Solve step by step. Show all working.',messages:[{role:'user',content:q}]})});const data=await res.json();out.textContent=data.content?.[0]?.text||'';}catch(e){out.textContent='Error.';}
+}
+document.getElementById('math-ai-inp').addEventListener('keydown',e=>{if(e.key==='Enter')askMathAI();});
+drawGraph();
+</script>
+
+<!-- NEXUS AD SCRIPTS -->
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="https://pl29119943.profitablecpmratenetwork.com/95/36/71/953671a9b1c1310473849544757c959e.js"></script>
+<script src="https://pl29119946.profitablecpmratenetwork.com/4e/c2/c8/4ec2c859136af96e53357bc9a21d1063.js"></script>
+<script async data-cfasync="false" src="https://pl29072711.profitablecpmratenetwork.com/fe2c19526de3ee03ac6f5077ca63cdaa/invoke.js"></script>
+
+<script src="js/premium.js"></script>
+</body>
+</html>

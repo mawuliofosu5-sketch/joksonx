@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS Music Studio</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.beat-grid{display:grid;grid-template-columns:repeat(16,1fr);gap:4px;margin:1rem 0;}
+.beat-cell{height:36px;border-radius:4px;background:rgba(0,245,255,0.08);border:1px solid var(--border);cursor:pointer;transition:all 0.15s;}
+.beat-cell.active{background:linear-gradient(135deg,var(--cyan),var(--magenta));box-shadow:0 0 8px var(--cyan);}
+.beat-cell.playing{box-shadow:0 0 20px var(--cyan)!important;}
+.instrument-label{font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--cyan);writing-mode:horizontal-tb;margin-bottom:4px;}
+.viz-canvas{width:100%;height:120px;background:#010a12;border:1px solid var(--cyan);border-radius:10px;}
+.track-list{display:flex;flex-direction:column;gap:0.8rem;}
+.track{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:1rem;}
+.track-title{font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--cyan);flex:1;}
+.track-artist{font-size:0.75rem;color:var(--magenta);}
+.track-btn{background:linear-gradient(135deg,var(--cyan),var(--magenta));border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;color:#000;}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html">Gaming</a></li><li><a href="science.html">Science</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li><li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html">Earn 💰</a></li><li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas><div class="cursor"></div><div class="cursor-ring"></div><div class="toast-container"></div>
+<div class="page-header"><h1>🎵 MUSIC STUDIO</h1><p>Beat maker, visualizer & AI music tools by JoksonX</p></div>
+<div class="section" style="padding-top:0">
+  <!-- VISUALIZER -->
+  <div class="reveal">
+    <div class="section-title" style="font-size:1rem;margin-bottom:0.8rem;">🌊 AUDIO VISUALIZER</div>
+    <canvas class="viz-canvas" id="viz-canvas"></canvas>
+    <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="startViz()">▶ START VIZ</button>
+      <button class="btn btn-outline" onclick="stopViz()">⏹ STOP</button>
+      <select id="viz-style" class="btn btn-outline" style="cursor:pointer;">
+        <option value="bars">BARS</option><option value="wave">WAVE</option><option value="circle">CIRCLE</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- BEAT MAKER -->
+  <div class="reveal" style="margin-top:2rem;">
+    <div class="section-title" style="font-size:1rem;margin-bottom:0.8rem;">🥁 BEAT SEQUENCER</div>
+    <div style="overflow-x:auto;">
+      <div id="beat-sequencer"></div>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-primary" id="play-beat" onclick="toggleBeat()">▶ PLAY</button>
+      <button class="btn btn-outline" onclick="clearBeat()">🗑 CLEAR</button>
+      <button class="btn btn-outline" onclick="randomBeat()">🎲 RANDOM</button>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <span style="font-size:0.75rem;font-family:'Orbitron',monospace;color:var(--cyan);">BPM:</span>
+        <input type="range" id="bpm" min="60" max="200" value="120" style="width:100px;">
+        <span id="bpm-val" style="font-family:'Share Tech Mono',monospace;color:var(--cyan);font-size:0.8rem;">120</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURED TRACKS -->
+  <div class="reveal" style="margin-top:2rem;">
+    <div class="section-title" style="font-size:1rem;margin-bottom:1rem;">🎧 FEATURED TRACKS</div>
+    <div class="track-list">
+      <div class="track"><div><div class="track-title">NEON NIGHTS BEAT</div><div class="track-artist">JoksonX • Cyberpunk</div></div><div style="flex:1"></div><span class="tag tag-cyan">NEW</span><button class="track-btn" onclick="playTrack(this,'neon')">▶</button></div>
+      <div class="track"><div><div class="track-title">CYBER BASS DROP</div><div class="track-artist">JoksonX • Electronic</div></div><div style="flex:1"></div><button class="track-btn" onclick="playTrack(this,'cyber')">▶</button></div>
+      <div class="track"><div><div class="track-title">STEM SYMPHONY</div><div class="track-artist">JoksonX • Ambient</div></div><div style="flex:1"></div><button class="track-btn" onclick="playTrack(this,'stem')">▶</button></div>
+    </div>
+  </div>
+
+  <!-- AI MUSIC -->
+  <div class="ai-tutor-box reveal" style="margin-top:2rem;">
+    <div class="ai-tutor-title">🎵 AI MUSIC GENERATOR (DESCRIPTION)</div>
+    <div class="field"><label>DESCRIBE YOUR SONG IDEA</label><input type="text" id="music-ai-inp" placeholder="e.g. A fast cyberpunk beat with heavy bass and synth..."/></div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <select id="music-genre" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;padding:10px 14px;"><option>Electronic</option><option>Hip-Hop</option><option>Ambient</option><option>Rock</option><option>Jazz</option><option>Classical</option></select>
+      <button class="btn btn-primary" onclick="generateMusicIdea()">🎵 GENERATE IDEA</button>
+    </div>
+    <div id="music-ai-out" class="ai-output" style="display:none;margin-top:0.8rem;"></div>
+  </div>
+</div>
+<footer><div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+// BEAT SEQUENCER
+const instruments=['KICK','SNARE','HI-HAT','BASS','SYNTH','CLAP'];
+const colors=['#00f5ff','#ff00ff','#39ff14','#ffd700','#ff8800','#ff4488'];
+let beatGrid=instruments.map(()=>Array(16).fill(false));
+let beatPlaying=false,beatStep=0,beatTimer=null;
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+
+function buildSequencer(){
+  const el=document.getElementById('beat-sequencer');
+  el.innerHTML=instruments.map((inst,i)=>`
+    <div class="instrument-label" style="color:${colors[i]}">${inst}</div>
+    <div class="beat-grid">${Array(16).fill(0).map((_,j)=>`<div class="beat-cell" data-i="${i}" data-j="${j}" onclick="toggleCell(${i},${j},this)"></div>`).join('')}</div>
+  `).join('');
+}
+
+function toggleCell(i,j,el){beatGrid[i][j]=!beatGrid[i][j];el.classList.toggle('active');}
+
+function playSound(type,time){
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  osc.connect(gain);gain.connect(audioCtx.destination);
+  const freqs={KICK:60,SNARE:200,['HI-HAT']:800,BASS:80,SYNTH:440,CLAP:300};
+  osc.frequency.value=freqs[type]||220;
+  if(type==='KICK'){osc.frequency.setValueAtTime(150,time);osc.frequency.exponentialRampToValueAtTime(50,time+0.1);}
+  gain.gain.setValueAtTime(0.5,time);gain.gain.exponentialRampToValueAtTime(0.001,time+0.15);
+  osc.start(time);osc.stop(time+0.2);
+}
+
+function stepBeat(){
+  const bpm=parseInt(document.getElementById('bpm').value);
+  const interval=60000/bpm/4;
+  document.querySelectorAll('.beat-cell').forEach(c=>c.classList.remove('playing'));
+  beatGrid.forEach((row,i)=>{if(row[beatStep]){playSound(instruments[i],audioCtx.currentTime);document.querySelectorAll(`.beat-cell[data-i="${i}"][data-j="${beatStep}"]`)[0]?.classList.add('playing');}});
+  beatStep=(beatStep+1)%16;
+  beatTimer=setTimeout(stepBeat,interval);
+}
+
+function toggleBeat(){
+  beatPlaying=!beatPlaying;
+  document.getElementById('play-beat').textContent=beatPlaying?'⏹ STOP':'▶ PLAY';
+  if(beatPlaying){audioCtx.resume();stepBeat();}else{clearTimeout(beatTimer);beatStep=0;}
+}
+
+function clearBeat(){beatGrid=instruments.map(()=>Array(16).fill(false));document.querySelectorAll('.beat-cell').forEach(c=>c.classList.remove('active'));toast('Beat cleared!');}
+function randomBeat(){clearBeat();beatGrid=instruments.map(()=>Array(16).fill(0).map(()=>Math.random()>0.75));beatGrid.forEach((row,i)=>row.forEach((v,j)=>{if(v)document.querySelector(`.beat-cell[data-i="${i}"][data-j="${j}"]`)?.classList.add('active');}));toast('Random beat generated!','success');}
+
+document.getElementById('bpm').addEventListener('input',function(){document.getElementById('bpm-val').textContent=this.value;});
+
+// VISUALIZER
+const vizCanvas=document.getElementById('viz-canvas');
+const vizCtx=vizCanvas.getContext('2d');
+let vizRunning=false,animNode=null,source=null;
+
+function startViz(){
+  if(!navigator.mediaDevices){toast('Microphone not available','error');runFakeViz();return;}
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+    source=audioCtx.createMediaStreamSource(stream);
+    animNode=audioCtx.createAnalyser();animNode.fftSize=256;
+    source.connect(animNode);vizRunning=true;drawViz();toast('Visualizer started!','success');
+  }).catch(()=>{runFakeViz();});
+}
+
+function runFakeViz(){vizRunning=true;const fakeData=new Uint8Array(64).map(()=>Math.random()*200);function draw(){if(!vizRunning)return;vizCanvas.width=vizCanvas.offsetWidth;const W=vizCanvas.width,H=120;vizCtx.fillStyle='rgba(1,10,18,0.3)';vizCtx.fillRect(0,0,W,H);const style=document.getElementById('viz-style').value;fakeData.forEach((v,i)=>{fakeData[i]=Math.max(20,Math.min(230,v+(Math.random()-0.5)*30));});drawStyle(style,fakeData,W,H);requestAnimationFrame(draw);}draw();}
+
+function drawViz(){if(!animNode)return;const data=new Uint8Array(animNode.frequencyBinCount);function draw(){if(!vizRunning)return;animNode.getByteFrequencyData(data);vizCanvas.width=vizCanvas.offsetWidth;const W=vizCanvas.width,H=120;vizCtx.fillStyle='rgba(1,10,18,0.3)';vizCtx.fillRect(0,0,W,H);drawStyle(document.getElementById('viz-style').value,data,W,H);requestAnimationFrame(draw);}draw();}
+
+function drawStyle(style,data,W,H){
+  if(style==='bars'){const bw=W/data.length;data.forEach((v,i)=>{const h=v/255*H;const g=vizCtx.createLinearGradient(0,H,0,H-h);g.addColorStop(0,'#00f5ff');g.addColorStop(1,'#ff00ff');vizCtx.fillStyle=g;vizCtx.shadowColor='#00f5ff';vizCtx.shadowBlur=4;vizCtx.fillRect(i*bw,H-h,bw-1,h);});vizCtx.shadowBlur=0;}
+  else if(style==='wave'){vizCtx.strokeStyle='#00f5ff';vizCtx.lineWidth=2;vizCtx.shadowColor='#00f5ff';vizCtx.shadowBlur=8;vizCtx.beginPath();data.forEach((v,i)=>{const x=i/data.length*W;const y=H/2+(v/255-0.5)*H;i===0?vizCtx.moveTo(x,y):vizCtx.lineTo(x,y);});vizCtx.stroke();vizCtx.shadowBlur=0;}
+  else{const cx=W/2,cy=H/2,r=Math.min(cx,cy)-10;vizCtx.strokeStyle='#ff00ff';vizCtx.lineWidth=2;vizCtx.beginPath();data.forEach((v,i)=>{const a=i/data.length*Math.PI*2;const len=r+v/255*30;vizCtx.lineTo(cx+Math.cos(a)*len,cy+Math.sin(a)*len);});vizCtx.closePath();vizCtx.stroke();}
+}
+
+function stopViz(){vizRunning=false;vizCtx.clearRect(0,0,vizCanvas.width,vizCanvas.height);}
+
+function playTrack(btn,name){const sounds={neon:220,cyber:110,stem:330};const osc=audioCtx.createOscillator();const g=audioCtx.createGain();osc.connect(g);g.connect(audioCtx.destination);osc.frequency.value=sounds[name]||220;osc.type='sawtooth';g.gain.setValueAtTime(0.15,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+2);osc.start();osc.stop(audioCtx.currentTime+2);btn.textContent='⏸';setTimeout(()=>btn.textContent='▶',2000);toast('Playing: '+name+' track 🎵');}
+
+async function generateMusicIdea(){const desc=document.getElementById('music-ai-inp').value.trim();if(!desc){toast('Describe your song idea!','error');return;}const genre=document.getElementById('music-genre').value;const out=document.getElementById('music-ai-out');out.style.display='block';out.innerHTML='<span class="spinner"></span>';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are a music producer. Describe a detailed music production plan including BPM, key, instruments, structure (intro/verse/chorus/bridge/outro), mood, and production tips. Be specific and creative.',messages:[{role:'user',content:`Create a ${genre} song: ${desc}`}]})});const data=await res.json();out.textContent=data.content?.[0]?.text||'';}catch(e){out.textContent='Error.';}}
+
+buildSequencer();
+</script>
+
+<!-- NEXUS AD SCRIPTS -->
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="https://pl29119943.profitablecpmratenetwork.com/95/36/71/953671a9b1c1310473849544757c959e.js"></script>
+<script src="https://pl29119946.profitablecpmratenetwork.com/4e/c2/c8/4ec2c859136af96e53357bc9a21d1063.js"></script>
+<script async data-cfasync="false" src="https://pl29072711.profitablecpmratenetwork.com/fe2c19526de3ee03ac6f5077ca63cdaa/invoke.js"></script>
+
+<script src="js/premium.js"></script>
+</body>
+</html>

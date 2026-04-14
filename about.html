@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS — About JoksonX</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.creator-hero {
+  text-align:center; padding:6rem 2rem 2rem; position:relative; z-index:1;
+}
+.creator-avatar {
+  width:120px; height:120px; border-radius:50%;
+  background:linear-gradient(135deg,var(--cyan),var(--magenta));
+  display:flex; align-items:center; justify-content:center;
+  font-size:3.5rem; margin:0 auto 1.5rem;
+  box-shadow:var(--glow-cyan);
+  animation:pulse-avatar 2s ease-in-out infinite;
+}
+@keyframes pulse-avatar {
+  0%,100%{box-shadow:0 0 20px rgba(0,245,255,0.5);transform:scale(1);}
+  50%{box-shadow:0 0 40px rgba(0,245,255,0.8),0 0 60px rgba(255,0,255,0.3);transform:scale(1.03);}
+}
+.creator-name {
+  font-family:'Orbitron',monospace; font-size:2.5rem; font-weight:900;
+  background:linear-gradient(90deg,var(--cyan),var(--magenta),var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  margin-bottom:0.4rem;
+}
+.creator-role { color:var(--neon-green); font-family:'Share Tech Mono',monospace; font-size:0.9rem; letter-spacing:2px; margin-bottom:1rem; }
+.creator-bio { max-width:600px; margin:0 auto; opacity:0.8; line-height:1.8; font-size:1rem; }
+
+.skills-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem; }
+.skill-card {
+  background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.2rem;
+  text-align:center; transition:all 0.3s;
+}
+.skill-card:hover { border-color:var(--cyan); box-shadow:var(--glow-cyan); }
+.skill-icon { font-size:2rem; margin-bottom:0.5rem; }
+.skill-name { font-family:'Orbitron',monospace; font-size:0.75rem; color:var(--cyan); margin-bottom:0.5rem; }
+.skill-level { font-size:0.75rem; color:var(--magenta); }
+
+.tech-stack { display:flex; flex-wrap:wrap; gap:0.8rem; }
+.tech-badge {
+  background:rgba(0,245,255,0.08); border:1px solid var(--cyan);
+  border-radius:8px; padding:6px 14px;
+  font-family:'Share Tech Mono',monospace; font-size:0.8rem; color:var(--cyan);
+  transition:all 0.2s;
+}
+.tech-badge:hover { box-shadow:var(--glow-cyan); background:rgba(0,245,255,0.15); }
+
+.project-card {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:1.5rem; transition:all 0.3s;
+}
+.project-card:hover { border-color:var(--magenta); box-shadow:var(--glow-mag); transform:translateY(-4px); }
+.project-icon { font-size:2rem; margin-bottom:0.8rem; }
+.project-title { font-family:'Orbitron',monospace; font-size:0.85rem; color:var(--cyan); margin-bottom:0.4rem; }
+.project-desc { font-size:0.83rem; opacity:0.7; line-height:1.5; }
+
+.testimonial {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:1.5rem; position:relative;
+}
+.testimonial::before { content:'"'; position:absolute; top:-10px; left:16px; font-size:3rem; color:var(--cyan); opacity:0.3; font-family:'Orbitron',monospace; }
+.testimonial-text { font-size:0.9rem; line-height:1.7; opacity:0.85; margin-bottom:0.8rem; }
+.testimonial-author { font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--magenta); }
+
+.achievement-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; }
+.achievement {
+  display:flex; align-items:center; gap:1rem;
+  background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1rem;
+}
+.achievement-icon { font-size:2rem; flex-shrink:0; }
+.achievement-title { font-family:'Orbitron',monospace; font-size:0.75rem; color:var(--gold); }
+.achievement-desc { font-size:0.75rem; opacity:0.6; }
+
+.cta-box {
+  background:linear-gradient(135deg,rgba(0,245,255,0.08),rgba(255,0,255,0.06));
+  border:1px solid var(--cyan); border-radius:20px; padding:3rem;
+  text-align:center;
+}
+.cta-title { font-family:'Orbitron',monospace; font-size:1.5rem; color:var(--cyan); margin-bottom:1rem; }
+.cta-sub { opacity:0.7; margin-bottom:2rem; font-size:1rem; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html">Gaming</a></li>
+    <li><a href="science.html">Science</a></li>
+    <li><a href="videos.html">Videos</a></li>
+    <li><a href="movies.html">Movies</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li>
+    <li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html">Earn 💰</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+  </ul>
+</nav>
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas>
+<div class="cursor"></div><div class="cursor-ring"></div>
+<div class="toast-container"></div>
+
+<!-- CREATOR HERO -->
+<div class="creator-hero">
+  <div class="creator-avatar">⚡</div>
+  <div class="creator-name glitch" data-text="JoksonX">JoksonX</div>
+  <div class="creator-role">DEVELOPER · DESIGNER · INNOVATOR · GRADE 6 GENIUS</div>
+  <p class="creator-bio">
+    A 15-year-old creator from <strong>One STEM 6</strong>, age 15, who builds full-stack web platforms, Android apps,
+    and gaming portals with a signature cyberpunk aesthetic. Turning ideas into digital realities — one line of code at a time.
+  </p>
+  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;">
+    <span class="tag tag-cyan">WEB DEV</span>
+    <span class="tag tag-mag">ANDROID APPS</span>
+    <span class="tag tag-green">AI INTEGRATION</span>
+    <span class="tag tag-cyan">GAME DESIGN</span>
+    <span class="tag tag-mag">UI/UX</span>
+    <span class="tag tag-green">CYBERPUNK</span>
+  </div>
+</div>
+
+<div class="section" style="padding-top:0">
+  <!-- STATS -->
+  <div class="stats-grid reveal">
+    <div class="stat-box"><div class="stat-num" data-count="5">0</div><div class="stat-label">MAJOR PROJECTS</div></div>
+    <div class="stat-box"><div class="stat-num" data-count="50">0</div><div class="stat-label">GAMES BUILT</div></div>
+    <div class="stat-box"><div class="stat-num" data-count="6">0</div><div class="stat-label">STEM TOOLS</div></div>
+    <div class="stat-box"><div class="stat-num" data-count="100">0</div><div class="stat-label">% PASSION</div></div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="section-title reveal" style="margin-top:2rem;">💻 TECHNICAL SKILLS</div>
+  <p class="section-sub reveal">What JoksonX brings to the table</p>
+  <div class="skills-grid reveal">
+    <div class="skill-card"><div class="skill-icon">🌐</div><div class="skill-name">HTML / CSS</div><div class="skill-level">⭐⭐⭐⭐⭐ Expert</div></div>
+    <div class="skill-card"><div class="skill-icon">⚡</div><div class="skill-name">JAVASCRIPT</div><div class="skill-level">⭐⭐⭐⭐ Advanced</div></div>
+    <div class="skill-card"><div class="skill-icon">📱</div><div class="skill-name">ANDROID (KOTLIN)</div><div class="skill-level">⭐⭐⭐ Intermediate</div></div>
+    <div class="skill-card"><div class="skill-icon">🤖</div><div class="skill-name">AI INTEGRATION</div><div class="skill-level">⭐⭐⭐⭐ Advanced</div></div>
+    <div class="skill-card"><div class="skill-icon">🎮</div><div class="skill-name">CANVAS GAMING</div><div class="skill-level">⭐⭐⭐⭐ Advanced</div></div>
+    <div class="skill-card"><div class="skill-icon">🎨</div><div class="skill-name">UI / UX DESIGN</div><div class="skill-level">⭐⭐⭐⭐ Advanced</div></div>
+  </div>
+
+  <!-- TECH STACK -->
+  <div class="section-title reveal" style="margin-top:2rem;">🛠️ TECH STACK</div>
+  <div class="tech-stack reveal" style="max-width:700px;margin:0 auto 2rem;">
+    <span class="tech-badge">HTML5</span><span class="tech-badge">CSS3</span>
+    <span class="tech-badge">JavaScript ES6+</span><span class="tech-badge">Canvas API</span>
+    <span class="tech-badge">Web Audio API</span><span class="tech-badge">Anthropic Claude API</span>
+    <span class="tech-badge">Kotlin</span><span class="tech-badge">Sketchware Pro</span>
+    <span class="tech-badge">WebRTC</span><span class="tech-badge">LocalStorage</span>
+    <span class="tech-badge">CSS Animations</span><span class="tech-badge">Responsive Design</span>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="section-title reveal">🚀 FEATURED PROJECTS</div>
+  <p class="section-sub reveal">Built by JoksonX — from concept to deployment</p>
+  <div class="grid reveal">
+    <div class="project-card">
+      <div class="project-icon">⚡</div>
+      <div class="project-title">NEXUS PLATFORM</div>
+      <div class="project-desc">This very website! A full-stack educational and entertainment platform with 50+ games, AI search, earn system, and more.</div>
+    </div>
+    <div class="project-card">
+      <div class="project-icon">🎮</div>
+      <div class="project-title">NEON ARCADE</div>
+      <div class="project-desc">Gaming & educational portal with 50 games, live chat, leaderboards, and a creator page — delivered as multi-page ZIP.</div>
+    </div>
+    <div class="project-card">
+      <div class="project-icon">🎵</div>
+      <div class="project-title">JOKSONX MUSIC STUDIO</div>
+      <div class="project-desc">Full music studio website with Web Audio API — beat splitter with waveform rendering, 16-step beat sequencer, song feed.</div>
+    </div>
+    <div class="project-card">
+      <div class="project-icon">📱</div>
+      <div class="project-title">ONE STEM SIX APP</div>
+      <div class="project-desc">Android app (Kotlin) featuring code editor, code runner, past questions bank, and offline LAN/Bluetooth chat for classmates.</div>
+    </div>
+    <div class="project-card">
+      <div class="project-icon">🌐</div>
+      <div class="project-title">CLASS WEBSITE</div>
+      <div class="project-desc">One STEM 6 website with 7 canvas games, AI tutor, 6 study tools, WebRTC video chat — all in a ZIP package.</div>
+    </div>
+    <div class="project-card">
+      <div class="project-icon">🔬</div>
+      <div class="project-title">STEM RESEARCH DOCS</div>
+      <div class="project-desc">Professional semiconductor fabrication chemistry group research documents with full formatting and references.</div>
+    </div>
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="section-title reveal" style="margin-top:2rem;">🏆 ACHIEVEMENTS</div>
+  <div class="achievement-row reveal">
+    <div class="achievement"><div class="achievement-icon">🌟</div><div><div class="achievement-title">YOUNGEST FULL-STACK DEV</div><div class="achievement-desc">Built complete web platforms at Grade 6</div></div></div>
+    <div class="achievement"><div class="achievement-icon">🎮</div><div><div class="achievement-title">GAME ARCHITECT</div><div class="achievement-desc">Designed and coded 50+ web games</div></div></div>
+    <div class="achievement"><div class="achievement-icon">🤖</div><div><div class="achievement-title">AI INTEGRATOR</div><div class="achievement-desc">Built AI-powered tools using Claude API</div></div></div>
+    <div class="achievement"><div class="achievement-icon">📱</div><div><div class="achievement-title">APP DEVELOPER</div><div class="achievement-desc">Published Android app for classroom</div></div></div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="section-title reveal" style="margin-top:2rem;">💬 WHAT PEOPLE SAY</div>
+  <div class="grid reveal">
+    <div class="testimonial">
+      <div class="testimonial-text">JoksonX is unreal — building full websites and apps while still in Grade 6? The future of tech is in good hands.</div>
+      <div class="testimonial-author">— Classmate, One STEM 6</div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-text">The NEXUS platform is incredibly polished. The cyberpunk aesthetic, AI integration, and game design show real talent and creativity.</div>
+      <div class="testimonial-author">— Digital Arts Enthusiast</div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-text">The Android app JoksonX built for our class is better than apps made by professional developers. Truly impressive work.</div>
+      <div class="testimonial-author">— One STEM 6 Student</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box reveal" style="margin-top:3rem;">
+    <div class="cta-title">🚀 READY TO EXPLORE NEXUS?</div>
+    <p class="cta-sub">Discover learning, gaming, science, movies, and more — all powered by AI. Built with passion by JoksonX.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="index.html" class="btn btn-primary">🏠 GO HOME</a>
+      <a href="learn.html" class="btn btn-outline">📚 START LEARNING</a>
+      <a href="gaming.html" class="btn btn-outline">🎮 PLAY GAMES</a>
+      <a href="earn.html" class="btn btn-outline">💰 EARN MONEY</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-grid" style="max-width:1200px;margin:0 auto 2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:2rem;text-align:left;">
+    <div class="footer-col"><h4>NEXUS</h4><a href="index.html">Home</a><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a><a href="learn.html">Learn</a><a href="gaming.html">Gaming</a></div>
+    <div class="footer-col"><h4>EXPLORE</h4><a href="science.html">Science</a><a href="videos.html">Videos</a><a href="movies.html">Movies</a><a href="ai-tools.html">AI Tools</a></div>
+    <div class="footer-col"><h4>COMMUNITY</h4><a href="chat.html">Chat</a><a href="earn.html">Earn Money</a><a href="news.html">Tech News</a><a href="music.html">Music</a></div>
+    <div class="footer-col"><h4>JOKSONX</h4><p style="font-size:0.85rem;color:rgba(200,230,240,0.6);line-height:1.8;">Creator of NEXUS<br>One STEM 6<br>Age 15 · Class of Innovators<br>Building Tomorrow</p></div>
+  </div>
+  <div class="neon-line"></div>
+  <div class="footer-bottom">© 2025 NEXUS PLATFORM — MADE WITH ❤️ AND ⚡ BY JOKSONX | ONE STEM 6 | AGE 15 | ALL RIGHTS RESERVED</div>
+</footer>
+
+
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+
+<!-- NEXUS AD SCRIPTS -->
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="https://pl29119943.profitablecpmratenetwork.com/95/36/71/953671a9b1c1310473849544757c959e.js"></script>
+<script src="https://pl29119946.profitablecpmratenetwork.com/4e/c2/c8/4ec2c859136af96e53357bc9a21d1063.js"></script>
+<script async data-cfasync="false" src="https://pl29072711.profitablecpmratenetwork.com/fe2c19526de3ee03ac6f5077ca63cdaa/invoke.js"></script>
+
+<script src="js/premium.js"></script>
+</body>
+</html>

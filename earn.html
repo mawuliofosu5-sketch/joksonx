@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS Earn — Mine Real Money</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* ---- TABS ---- */
+.earn-tabs{display:flex;gap:0.4rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap;}
+.earn-tab{font-family:'Orbitron',monospace;font-size:0.65rem;padding:9px 18px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text);cursor:pointer;transition:all 0.2s;letter-spacing:1px;}
+.earn-tab:hover,.earn-tab.active{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,0.06);box-shadow:0 0 12px rgba(255,215,0,0.2);}
+.tab-panel{display:none;animation:slide-in 0.3s ease;}
+.tab-panel.active{display:block;}
+@keyframes slide-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ---- WALLET ---- */
+.wallet-card{background:linear-gradient(135deg,rgba(0,245,255,0.08),rgba(255,215,0,0.05));border:2px solid var(--cyan);border-radius:24px;padding:2rem;text-align:center;max-width:560px;margin:0 auto 2rem;box-shadow:var(--glow-cyan);position:relative;overflow:hidden;}
+.wallet-card::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 30px,rgba(0,245,255,0.015) 30px,rgba(0,245,255,0.015) 60px);}
+.wallet-bal{font-family:'Orbitron',monospace;font-size:3.5rem;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(255,215,0,0.5);position:relative;z-index:1;}
+.wallet-label{font-size:0.72rem;color:rgba(200,230,240,0.5);letter-spacing:2px;font-family:'Share Tech Mono',monospace;position:relative;z-index:1;}
+.wallet-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;margin-top:1rem;position:relative;z-index:1;}
+.wb-item{background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:10px;padding:0.7rem;}
+.wb-val{font-family:'Orbitron',monospace;font-size:0.95rem;color:var(--cyan);}
+.wb-lbl{font-size:0.6rem;opacity:0.5;letter-spacing:1px;margin-top:2px;}
+
+/* ---- MACHINES ---- */
+.machines-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;}
+.miner-card{background:linear-gradient(135deg,rgba(0,245,255,0.05),rgba(255,215,0,0.04));border:1px solid rgba(255,215,0,0.35);border-radius:20px;padding:1.8rem;text-align:center;transition:all 0.3s;position:relative;overflow:hidden;}
+.miner-card:hover{transform:translateY(-8px);border-color:var(--gold);box-shadow:0 0 40px rgba(255,215,0,0.25);}
+.miner-card.premium-miner{border-color:var(--magenta);}
+.miner-card.premium-miner:hover{box-shadow:0 0 40px rgba(255,0,255,0.3);}
+.miner-card.elite-miner{border-color:var(--cyan);}
+.miner-card.elite-miner:hover{box-shadow:0 0 40px rgba(0,245,255,0.3);}
+.pop-badge{position:absolute;top:0;right:0;background:linear-gradient(135deg,var(--magenta),#8800ff);color:#fff;font-family:'Orbitron',monospace;font-size:0.55rem;padding:5px 12px;border-radius:0 20px 0 12px;letter-spacing:1px;}
+.elite-badge{position:absolute;top:0;right:0;background:linear-gradient(135deg,var(--cyan),var(--neon-green));color:#000;font-family:'Orbitron',monospace;font-size:0.55rem;padding:5px 12px;border-radius:0 20px 0 12px;letter-spacing:1px;}
+.prem-badge{position:absolute;top:0;left:0;background:linear-gradient(135deg,#ffd700,#ff8800);color:#000;font-family:'Orbitron',monospace;font-size:0.55rem;padding:5px 12px;border-radius:20px 0 12px 0;letter-spacing:1px;}
+.machine-icon{font-size:3.2rem;margin-bottom:0.7rem;display:block;animation:machine-pulse 2s ease-in-out infinite;}
+@keyframes machine-pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.07);}}
+.machine-name{font-family:'Orbitron',monospace;font-size:0.95rem;color:var(--gold);margin-bottom:0.2rem;}
+.machine-rate{color:var(--neon-green);font-size:0.75rem;margin-bottom:0.5rem;font-family:'Share Tech Mono',monospace;}
+.machine-price{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:var(--cyan);text-shadow:var(--glow-cyan);margin-bottom:0.8rem;}
+.machine-features{list-style:none;margin-bottom:1rem;text-align:left;}
+.machine-features li{font-size:0.78rem;padding:4px 0;border-bottom:1px solid rgba(0,245,255,0.06);opacity:0.88;}
+.machine-features li::before{content:'⚡ ';}
+.machine-owned{display:inline-block;padding:6px 16px;background:rgba(57,255,20,0.1);border:1px solid var(--neon-green);border-radius:6px;color:var(--neon-green);font-family:'Orbitron',monospace;font-size:0.68rem;}
+
+/* ---- AD ZONE ---- */
+.ad-zone{background:linear-gradient(135deg,rgba(255,215,0,0.06),rgba(255,0,255,0.04));border:2px dashed var(--gold);border-radius:20px;padding:2rem;text-align:center;margin:1.5rem 0;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
+.ad-zone:hover{box-shadow:0 0 30px rgba(255,215,0,0.3);}
+.ad-zone.clicked{animation:flash-gold 0.3s ease;}
+@keyframes flash-gold{0%,100%{background:rgba(255,215,0,0.06);}50%{background:rgba(255,215,0,0.2);}}
+.coin-anim{position:fixed;pointer-events:none;z-index:9999;font-size:1.5rem;animation:coin-fly 1s ease-out forwards;}
+@keyframes coin-fly{0%{transform:translateY(0) scale(1);opacity:1;}100%{transform:translateY(-120px) scale(0.5);opacity:0;}}
+
+/* ---- ACTIVE MINER ---- */
+.active-miner-card{background:linear-gradient(135deg,rgba(57,255,20,0.07),rgba(0,245,255,0.04));border:2px solid var(--neon-green);border-radius:16px;padding:1.3rem;margin-bottom:1rem;}
+.mine-bar{background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);border-radius:4px;height:10px;overflow:hidden;margin:0.7rem 0;}
+.mine-fill{height:100%;background:linear-gradient(90deg,var(--neon-green),var(--cyan));border-radius:4px;transition:width 1s linear;}
+
+/* ---- PAYMENT MODAL ---- */
+.pay-step{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;}
+.pay-step-num{font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.4rem;}
+.momo-number{font-family:'Orbitron',monospace;font-size:1.6rem;color:var(--cyan);text-shadow:var(--glow-cyan);background:rgba(0,245,255,0.06);border:1px solid var(--cyan);border-radius:10px;padding:0.8rem 1.5rem;display:inline-block;letter-spacing:3px;}
+.method-row{display:flex;gap:0.6rem;flex-wrap:wrap;margin:0.8rem 0;}
+.method-btn{flex:1;min-width:80px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.7rem;text-align:center;cursor:pointer;transition:all 0.2s;font-size:0.75rem;}
+.method-btn:hover,.method-btn.sel{border-color:var(--cyan);background:rgba(0,245,255,0.08);color:var(--cyan);}
+.method-icon{font-size:1.4rem;margin-bottom:0.3rem;display:block;}
+.wd-form{margin-top:1.2rem;animation:slide-in 0.3s ease;}
+.wd-form .field{margin-bottom:0.9rem;}
+.wd-form .field label{display:block;font-size:0.72rem;letter-spacing:1px;opacity:0.6;margin-bottom:5px;}
+
+/* ---- SPIN WHEEL ---- */
+#spin-canvas{display:block;border-radius:50%;cursor:pointer;box-shadow:0 0 50px rgba(255,215,0,0.4);max-width:320px;max-height:320px;}
+.spin-wrapper{display:flex;flex-direction:column;align-items:center;gap:1.5rem;}
+
+/* ---- TASKS ---- */
+.task-item{background:var(--card);border-radius:14px;padding:1rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;transition:border-color 0.3s;}
+.task-progress{background:rgba(0,245,255,0.1);border-radius:4px;height:6px;overflow:hidden;flex:1;min-width:80px;}
+.task-fill{height:100%;border-radius:4px;transition:width 0.5s;}
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas>
+<div class="cursor"></div><div class="cursor-ring"></div>
+<div class="toast-container"></div>
+
+<!-- AD SCRIPTS -->
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="https://pl29119943.profitablecpmratenetwork.com/95/36/71/953671a9b1c1310473849544757c959e.js"></script>
+<script async data-cfasync="false" src="https://pl29072711.profitablecpmratenetwork.com/fe2c19526de3ee03ac6f5077ca63cdaa/invoke.js"></script>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html">Gaming</a></li><li><a href="science.html">Science</a></li>
+    <li><a href="videos.html">Videos</a></li><li><a href="movies.html">Movies</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li><li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html" class="active">Earn 💰</a></li><li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <h1>💰 EARN MONEY</h1>
+  <p>Watch ads · Mine automatically · Spin daily · Complete tasks · Invite friends · Withdraw real cash</p>
+</div>
+
+<div class="section" style="padding-top:0">
+
+  <!-- PREMIUM BANNER -->
+  <div id="premium-earn-banner" class="reveal" style="margin-bottom:1.5rem;display:none;">
+    <div style="background:linear-gradient(135deg,rgba(255,215,0,0.1),rgba(255,136,0,0.06));border:2px solid var(--gold);border-radius:16px;padding:1rem 1.5rem;text-align:center;">
+      <span style="font-family:'Orbitron',monospace;color:var(--gold);font-size:0.9rem;">⭐ PREMIUM ACTIVE — <span id="prem-mult-display">1x</span> Mining Multiplier • <span id="prem-days-disp">0</span> days left</span>
+    </div>
+  </div>
+
+  <!-- WALLET CARD -->
+  <div class="wallet-card reveal">
+    <div class="wallet-label">NEXUS WALLET BALANCE</div>
+    <div class="wallet-bal">$<span id="wallet-display">0.0000</span></div>
+    <div style="margin:1rem 0;position:relative;z-index:1;">
+      <div class="progress-bar"><div class="progress-fill" id="earn-progress" style="width:0%"></div></div>
+      <div class="wallet-label" style="margin-top:0.4rem;">$<span id="wallet-display2">0.0000</span> / $10,000 to withdraw</div>
+    </div>
+    <div class="wallet-breakdown">
+      <div class="wb-item"><div class="wb-val" id="ad-earned">$0.00</div><div class="wb-lbl">FROM ADS</div></div>
+      <div class="wb-item"><div class="wb-val" id="mine-earned">$0.00</div><div class="wb-lbl">FROM MINERS</div></div>
+      <div class="wb-item"><div class="wb-val" id="bonus-earned">$0.00</div><div class="wb-lbl">BONUSES</div></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="earn-tabs reveal">
+    <button class="earn-tab active" onclick="switchTab('ads',this)">📢 ADS</button>
+    <button class="earn-tab" onclick="switchTab('machines',this)">⚙️ MINING</button>
+    <button class="earn-tab" onclick="switchTab('tasks',this)">✅ TASKS</button>
+    <button class="earn-tab" onclick="switchTab('spin',this)">🎰 SPIN</button>
+    <button class="earn-tab" onclick="switchTab('referral',this)">👥 REFERRAL</button>
+    <button class="earn-tab" onclick="switchTab('aiearner',this)">🤖 AI EARNER</button>
+    <button class="earn-tab" onclick="switchTab('withdraw',this)">💸 WITHDRAW</button>
+  </div>
+
+  <!-- ====== ADS TAB ====== -->
+  <div class="tab-panel active" id="tab-ads">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.88rem;color:var(--cyan);">CLICKS: <strong id="click-display" style="color:var(--gold);font-size:1.2rem;">0</strong> / 1,000,000</div>
+      <div style="font-size:0.75rem;opacity:0.5;margin-top:0.3rem;">Each click = $0.01 • Premium users earn <span id="click-mult" style="color:var(--gold);">1x</span> rate</div>
+    </div>
+    <div class="ad-zone reveal" id="ad-zone" onclick="clickAd(event)">
+      <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--gold);margin-bottom:0.5rem;">📢 CLICK THE AD TO EARN</div>
+      <div style="font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Each click earns you real money in your NEXUS wallet</div>
+      <div id="container-fe2c19526de3ee03ac6f5077ca63cdaa" style="min-height:80px;display:flex;align-items:center;justify-content:center;"></div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--neon-green);margin-top:1rem;">💰 $0.01 PER CLICK — MINIMUM WITHDRAWAL $10,000</div>
+    </div>
+    <div style="text-align:center;margin:1rem 0;">
+      <button class="btn btn-gold" style="font-size:1rem;padding:16px 48px;" onclick="clickAd(event)">👆 CLICK TO EARN $0.01</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-top:2rem;" class="reveal">
+      <div class="stat-box"><div class="stat-num" id="total-clicks-display">0</div><div class="stat-label">TOTAL CLICKS</div></div>
+      <div class="stat-box"><div class="stat-num" id="clicks-needed">1,000,000</div><div class="stat-label">TO WITHDRAW</div></div>
+      <div class="stat-box"><div class="stat-num" id="today-earned">$0.00</div><div class="stat-label">TODAY'S EARNINGS</div></div>
+      <div class="stat-box"><div class="stat-num" id="streak-display">0🔥</div><div class="stat-label">DAY STREAK</div></div>
+    </div>
+  </div>
+
+  <!-- ====== MACHINES TAB ====== -->
+  <div class="tab-panel" id="tab-machines">
+    <div style="background:linear-gradient(135deg,rgba(255,215,0,0.06),rgba(0,245,255,0.04));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:1.2rem;margin-bottom:2rem;text-align:center;">
+      <div style="font-family:'Orbitron',monospace;color:var(--gold);font-size:0.9rem;margin-bottom:0.5rem;">⚙️ HOW MINING WORKS</div>
+      <div style="font-size:0.85rem;opacity:0.8;line-height:1.7;">Buy a machine once → it mines to your wallet 24/7 automatically. Premium users get up to <strong style="color:var(--gold);">5x multiplier</strong> on all machines. Payment is processed securely via MTN MoMo.</div>
+    </div>
+
+    <!-- Active miners -->
+    <div id="active-miners-section" style="display:none;margin-bottom:2rem;">
+      <div class="section-title" style="font-size:1rem;margin-bottom:1rem;">⚙️ YOUR ACTIVE MINERS</div>
+      <div id="active-miners-list"></div>
+    </div>
+
+    <div class="section-title" style="font-size:1rem;margin-bottom:1.5rem;">🛒 BUY A MINING MACHINE</div>
+    <div class="machines-grid">
+
+      <!-- LITE -->
+      <div class="miner-card" id="card-LITE">
+        <span class="machine-icon">🔧</span>
+        <div class="machine-name">NEXUS LITE MINER</div>
+        <div class="machine-rate">⚡ Earns $0.50/hr automatically</div>
+        <div class="machine-price">$5.00</div>
+        <ul class="machine-features">
+          <li>Auto-mines $0.50 every hour</li>
+          <li>$12 per day passive income</li>
+          <li>No clicking required</li>
+          <li>Runs 24/7 in background</li>
+          <li>Best for beginners</li>
+        </ul>
+        <div id="btn-LITE"><button class="btn btn-gold" style="width:100%;" onclick="openBuyModal('LITE','NEXUS LITE MINER','5.00','0.50')">🛒 BUY FOR $5.00</button></div>
+      </div>
+
+      <!-- PRO -->
+      <div class="miner-card" id="card-PRO">
+        <div class="pop-badge">🔥 POPULAR</div>
+        <span class="machine-icon">⚙️</span>
+        <div class="machine-name">NEXUS PRO MINER</div>
+        <div class="machine-rate">⚡ Earns $1.20/hr automatically</div>
+        <div class="machine-price">$15.00</div>
+        <ul class="machine-features">
+          <li>Auto-mines $1.20 every hour</li>
+          <li>$28.80 per day earnings</li>
+          <li>2.4x faster than Lite</li>
+          <li>Priority mining queue</li>
+          <li>Weekend bonus multiplier</li>
+        </ul>
+        <div id="btn-PRO"><button class="btn btn-gold" style="width:100%;background:linear-gradient(135deg,var(--magenta),#8800ff);color:#fff;" onclick="openBuyModal('PRO','NEXUS PRO MINER','15.00','1.20')">🛒 BUY FOR $15.00</button></div>
+      </div>
+
+      <!-- ULTRA -->
+      <div class="miner-card" id="card-ULTRA">
+        <div class="elite-badge">💎 ELITE</div>
+        <span class="machine-icon">🚀</span>
+        <div class="machine-name">NEXUS ULTRA MINER</div>
+        <div class="machine-rate">⚡ Earns $3.00/hr automatically</div>
+        <div class="machine-price">$28.00</div>
+        <ul class="machine-features">
+          <li>Auto-mines $3.00 every hour</li>
+          <li>$72 per day earnings</li>
+          <li>6x faster than Lite</li>
+          <li>VIP withdrawal priority</li>
+          <li>1.5x weekend multiplier</li>
+          <li>Exclusive Ultra badge</li>
+        </ul>
+        <div id="btn-ULTRA"><button class="btn btn-gold" style="width:100%;background:linear-gradient(135deg,var(--cyan),var(--neon-green));color:#000;" onclick="openBuyModal('ULTRA','NEXUS ULTRA MINER','28.00','3.00')">🛒 BUY FOR $28.00</button></div>
+      </div>
+
+      <!-- QUANTUM (Premium only) -->
+      <div class="miner-card premium-miner" id="card-QUANTUM">
+        <div class="prem-badge">⭐ PREMIUM</div>
+        <div class="pop-badge" style="background:linear-gradient(135deg,#ffd700,#ff8800);">👑 EXCLUSIVE</div>
+        <span class="machine-icon" style="animation-duration:1s;">⚛️</span>
+        <div class="machine-name" style="color:var(--magenta);">NEXUS QUANTUM MINER</div>
+        <div class="machine-rate" style="color:var(--gold);">⚡ Earns $8.00/hr automatically</div>
+        <div class="machine-price" style="color:var(--magenta);text-shadow:var(--glow-mag);">$60.00</div>
+        <ul class="machine-features">
+          <li>Auto-mines $8.00 every hour</li>
+          <li>$192 per day earnings</li>
+          <li>16x faster than Lite</li>
+          <li>Quantum boost algorithm</li>
+          <li>2x weekend multiplier</li>
+          <li>Instant withdrawal unlock</li>
+          <li>Premium members only</li>
+        </ul>
+        <div id="btn-QUANTUM">
+          <div id="quantum-gate">
+            <button class="btn btn-gold" style="width:100%;background:linear-gradient(135deg,#ffd700,#ff8800);" onclick="checkQuantumAccess()">🔒 REQUIRES PREMIUM</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GALAXY (Elite+ only) -->
+      <div class="miner-card elite-miner" id="card-GALAXY">
+        <div class="elite-badge" style="background:linear-gradient(135deg,#ff00ff,#8800ff);color:#fff;">🌌 ELITE ONLY</div>
+        <span class="machine-icon" style="animation-duration:0.8s;">🌌</span>
+        <div class="machine-name" style="color:var(--cyan);">NEXUS GALAXY MINER</div>
+        <div class="machine-rate" style="color:var(--neon-green);">⚡ Earns $20.00/hr automatically</div>
+        <div class="machine-price" style="color:var(--cyan);">$120.00</div>
+        <ul class="machine-features">
+          <li>Auto-mines $20.00 every hour</li>
+          <li>$480 per day earnings</li>
+          <li>40x faster than Lite</li>
+          <li>Galaxy-tier algorithm</li>
+          <li>3x weekend + holiday bonus</li>
+          <li>VIP instant withdrawal</li>
+          <li>Elite/Lifetime members only</li>
+        </ul>
+        <div id="btn-GALAXY">
+          <button class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,var(--cyan),var(--magenta));" onclick="checkGalaxyAccess()">🔒 REQUIRES ELITE</button>
+        </div>
+      </div>
+
+      <!-- NEXUS MASTER (Lifetime) -->
+      <div class="miner-card" style="border-color:var(--gold);background:linear-gradient(135deg,rgba(255,215,0,0.07),rgba(255,136,0,0.04));" id="card-MASTER">
+        <div class="prem-badge" style="background:linear-gradient(135deg,#39ff14,var(--cyan));color:#000;">🏆 LIFETIME</div>
+        <span class="machine-icon" style="animation-duration:0.6s;">👑</span>
+        <div class="machine-name" style="color:var(--gold);">NEXUS MASTER MINER</div>
+        <div class="machine-rate" style="color:var(--gold);">⚡ Earns $50.00/hr — MAXIMUM POWER</div>
+        <div class="machine-price" style="color:var(--gold);">$250.00</div>
+        <ul class="machine-features">
+          <li>Auto-mines $50.00 every hour</li>
+          <li>$1,200 per day earnings</li>
+          <li>100x faster than Lite</li>
+          <li>Master-class AI algorithm</li>
+          <li>5x all-day multiplier</li>
+          <li>INSTANT withdrawals always</li>
+          <li>Lifetime members only</li>
+        </ul>
+        <div id="btn-MASTER">
+          <button class="btn btn-gold" style="width:100%;" onclick="checkMasterAccess()">🔒 REQUIRES LIFETIME</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:2rem;padding:1.2rem;background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.2);border-radius:12px;font-size:0.8rem;opacity:0.7;line-height:1.8;">
+      ⚠️ <strong>NOTE:</strong> Mining machines are virtual tools that simulate earnings on the NEXUS platform. Earnings accumulate in your NEXUS wallet. Minimum withdrawal: $10,000. Machines run as long as the NEXUS platform is active. Premium members get up to 5x multiplier on all earnings.
+    </div>
+  </div>
+
+  <!-- ====== DAILY TASKS TAB ====== -->
+  <div class="tab-panel" id="tab-tasks">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-family:'Orbitron',monospace;color:var(--gold);font-size:0.95rem;">✅ DAILY TASKS — Up to $3.00/day</div>
+      <div style="font-size:0.75rem;opacity:0.5;margin-top:0.3rem;">Tasks reset every 24 hours. Premium users get bonus task rewards.</div>
+    </div>
+    <div id="tasks-list" style="max-width:660px;margin:0 auto;display:grid;gap:0.8rem;"></div>
+    <div style="text-align:center;margin-top:1.5rem;">
+      <button class="btn btn-outline" onclick="initTasks()">🔄 REFRESH TASKS</button>
+    </div>
+  </div>
+
+  <!-- ====== SPIN TAB ====== -->
+  <div class="tab-panel" id="tab-spin">
+    <div style="text-align:center;margin-bottom:1rem;">
+      <div style="font-family:'Orbitron',monospace;color:var(--gold);font-size:0.95rem;">🎰 SPIN THE WHEEL</div>
+      <div style="font-size:0.75rem;opacity:0.55;margin-top:0.3rem;">Free spin every <span id="spin-timer-txt">4 hours</span> • Premium: every 2 hours • Spins left: <strong id="spins-left" style="color:var(--cyan);">1</strong></div>
+    </div>
+    <div class="spin-wrapper">
+      <canvas id="spin-canvas" width="320" height="320"></canvas>
+      <button class="btn btn-gold" style="font-size:1rem;padding:14px 48px;" id="spin-btn" onclick="doSpin()">🎰 SPIN NOW!</button>
+      <div id="spin-result" style="font-family:'Orbitron',monospace;font-size:1.3rem;color:var(--gold);display:none;text-align:center;"></div>
+      <div id="spin-countdown" style="font-size:0.8rem;color:rgba(200,230,240,0.5);display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ====== REFERRAL TAB ====== -->
+  <div class="tab-panel" id="tab-referral">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-family:'Orbitron',monospace;color:var(--gold);font-size:1rem;">👥 REFERRAL PROGRAM</div>
+      <div style="font-size:0.85rem;opacity:0.7;margin-top:0.3rem;">Earn <strong style="color:var(--neon-green);">$2.00</strong> for every friend who joins NEXUS!</div>
+    </div>
+    <div style="max-width:560px;margin:0 auto;">
+      <div class="wallet-card" style="margin-bottom:1.5rem;padding:1.5rem;">
+        <div class="wallet-label">YOUR REFERRAL CODE</div>
+        <div style="font-family:'Orbitron',monospace;font-size:2rem;color:var(--cyan);letter-spacing:4px;margin:0.5rem 0;" id="ref-code">NX-XXXX</div>
+        <button class="btn btn-outline" style="font-size:0.7rem;" onclick="copyRefCode()">📋 COPY CODE</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:1.5rem;">
+        <div class="stat-box"><div class="stat-num" id="ref-count">0</div><div class="stat-label">REFERRALS</div></div>
+        <div class="stat-box"><div class="stat-num" id="ref-earned">$0.00</div><div class="stat-label">EARNED</div></div>
+        <div class="stat-box"><div class="stat-num" id="ref-rate">$2.00</div><div class="stat-label">PER REFERRAL</div></div>
+      </div>
+      <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">REDEEM A FRIEND'S CODE</label><input type="text" id="ref-input" placeholder="Enter referral code (e.g. NX-AB12)..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;"/></div>
+      <button class="btn btn-primary" style="width:100%;margin-bottom:1.5rem;" onclick="submitRefCode()">✅ REDEEM CODE (+$2.00 BONUS)</button>
+      <div style="background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.2);border-radius:12px;padding:1.2rem;">
+        <div style="font-family:'Orbitron',monospace;color:var(--gold);font-size:0.8rem;margin-bottom:0.8rem;">📣 SHARE YOUR CODE</div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <button class="btn btn-outline" style="flex:1;font-size:0.7rem;" onclick="shareRef('whatsapp')">💬 WhatsApp</button>
+          <button class="btn btn-outline" style="flex:1;font-size:0.7rem;" onclick="shareRef('facebook')">👤 Facebook</button>
+          <button class="btn btn-outline" style="flex:1;font-size:0.7rem;" onclick="shareRef('twitter')">🐦 Twitter</button>
+          <button class="btn btn-outline" style="flex:1;font-size:0.7rem;" onclick="shareRef('telegram')">✈️ Telegram</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== AI EARNER TAB ====== -->
+  <div class="tab-panel" id="tab-aiearner">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-family:'Orbitron',monospace;color:var(--cyan);font-size:1rem;">🤖 AI EARNING ASSISTANT</div>
+      <div style="font-size:0.85rem;opacity:0.7;margin-top:0.3rem;">AI-powered strategies to maximize your NEXUS earnings. Ask anything!</div>
+    </div>
+    <div style="max-width:660px;margin:0 auto;">
+      <div class="ai-tutor-box" style="margin-bottom:1.5rem;">
+        <div class="ai-tutor-title">💬 ASK AI HOW TO EARN MORE</div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <input id="ai-earn-input" style="flex:1;min-width:180px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:0.9rem;padding:10px 14px;outline:none;" placeholder="How do I earn $100 fastest? What miner should I buy?"/>
+          <button class="btn btn-primary" onclick="askEarnAI()">ASK AI</button>
+        </div>
+        <div id="ai-earn-output" class="ai-output" style="display:none;margin-top:1rem;"></div>
+      </div>
+
+      <div style="display:grid;gap:0.8rem;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:all 0.2s;" onclick="quickAskEarn('What is the fastest way to reach $100 on NEXUS?')">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--cyan);">🚀 FASTEST PATH TO $100</div>
+          <div style="font-size:0.75rem;opacity:0.6;margin-top:0.3rem;">Tap to ask AI for the quickest earning strategy</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:all 0.2s;" onclick="quickAskEarn('Which mining machine gives the best ROI for my money?')">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--gold);">⚙️ BEST MACHINE ROI</div>
+          <div style="font-size:0.75rem;opacity:0.6;margin-top:0.3rem;">Which machine gives the best return on investment?</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:all 0.2s;" onclick="quickAskEarn('How does the NEXUS referral system work and how can I get more referrals?')">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--neon-green);">👥 REFERRAL MASTERY</div>
+          <div style="font-size:0.75rem;opacity:0.6;margin-top:0.3rem;">How to get more referrals and maximize bonus income</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:all 0.2s;" onclick="quickAskEarn('Is NEXUS Premium worth it? Compare the plans and tell me which is best value.')">
+          <div style="font-family:'Orbitron',monospace;font-size:0.78rem;color:var(--magenta);">⭐ IS PREMIUM WORTH IT?</div>
+          <div style="font-size:0.75rem;opacity:0.6;margin-top:0.3rem;">AI comparison of all premium plans and their ROI</div>
+        </div>
+      </div>
+
+      <!-- Live earnings projector -->
+      <div style="margin-top:1.5rem;background:rgba(0,245,255,0.05);border:1px solid rgba(0,245,255,0.3);border-radius:14px;padding:1.2rem;">
+        <div style="font-family:'Orbitron',monospace;color:var(--cyan);font-size:0.82rem;margin-bottom:1rem;">📊 EARNINGS PROJECTOR</div>
+        <div style="display:flex;gap:0.8rem;flex-wrap:wrap;margin-bottom:1rem;">
+          <div style="flex:1;min-width:120px;"><label style="font-size:0.68rem;opacity:0.6;display:block;margin-bottom:4px;">MACHINES OWNED</label><select id="proj-machine" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:8px;color:#fff;"><option value="0">None</option><option value="0.5">Lite ($5)</option><option value="1.2">Pro ($15)</option><option value="3">Ultra ($28)</option><option value="8">Quantum ($60)</option><option value="20">Galaxy ($120)</option><option value="50">Master ($250)</option></select></div>
+          <div style="flex:1;min-width:120px;"><label style="font-size:0.68rem;opacity:0.6;display:block;margin-bottom:4px;">ADS/DAY</label><input type="number" id="proj-ads" value="100" min="0" max="10000" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:8px;color:#fff;outline:none;"/></div>
+        </div>
+        <button class="btn btn-outline" style="font-size:0.7rem;" onclick="calcProjection()">📊 CALCULATE EARNINGS</button>
+        <div id="proj-result" style="margin-top:0.8rem;display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== WITHDRAW TAB ====== -->
+  <div class="tab-panel" id="tab-withdraw">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-family:'Orbitron',monospace;color:var(--gold);font-size:1.1rem;">YOUR BALANCE: $<span id="withdraw-bal">0.0000</span></div>
+      <div style="font-size:0.8rem;opacity:0.5;margin-top:0.3rem;">Minimum withdrawal: $10,000 | Premium VIP: $5,000 minimum</div>
+    </div>
+    <div style="max-width:540px;margin:0 auto;">
+      <div class="section-title" style="font-size:0.95rem;margin-bottom:1rem;">SELECT WITHDRAWAL METHOD</div>
+      <div class="method-row">
+        <div class="method-btn" onclick="selMethod(this,'MoMo')"><span class="method-icon">📱</span>MTN MoMo</div>
+        <div class="method-btn" onclick="selMethod(this,'Telecel')"><span class="method-icon">📲</span>Telecel</div>
+        <div class="method-btn" onclick="selMethod(this,'AirtelTigo')"><span class="method-icon">📡</span>AirtelTigo</div>
+        <div class="method-btn" onclick="selMethod(this,'PayPal')"><span class="method-icon">💳</span>PayPal</div>
+        <div class="method-btn" onclick="selMethod(this,'Bank')"><span class="method-icon">🏦</span>Bank</div>
+        <div class="method-btn" onclick="selMethod(this,'Crypto')"><span class="method-icon">₿</span>Crypto</div>
+        <div class="method-btn" onclick="selMethod(this,'Airtime')"><span class="method-icon">📶</span>Airtime</div>
+        <div class="method-btn" onclick="selMethod(this,'Binance')"><span class="method-icon">🟡</span>Binance</div>
+      </div>
+
+      <!-- MOMO / TELECEL / AIRTELTIGO FORM -->
+      <div id="wdf-mobile" class="wd-form" style="display:none;">
+        <div style="background:rgba(0,245,255,0.05);border:1px solid rgba(0,245,255,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--cyan);margin-bottom:0.5rem;">📱 MOBILE MONEY WITHDRAWAL</div>
+          <p style="font-size:0.78rem;opacity:0.6;line-height:1.6;">Enter your registered MoMo number below. Funds will be sent directly to that wallet within 24–72 hours.</p>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">FULL NAME (as on MoMo account)</label><input type="text" id="wd-momo-name" placeholder="e.g. Kwame Asante" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">MOMO PHONE NUMBER</label>
+          <div style="display:flex;gap:0.5rem;">
+            <select id="wd-momo-code" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;">
+              <option value="+233">🇬🇭 +233</option><option value="+234">🇳🇬 +234</option><option value="+254">🇰🇪 +254</option><option value="+27">🇿🇦 +27</option>
+            </select>
+            <input type="tel" id="wd-momo-num" placeholder="0XX XXX XXXX" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;"/>
+          </div>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">MOMO NETWORK</label>
+          <select id="wd-momo-net" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;">
+            <option value="MTN MoMo">MTN MoMo</option><option value="Telecel Cash">Telecel Cash</option><option value="AirtelTigo Money">AirtelTigo Money</option>
+          </select>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">AMOUNT TO WITHDRAW ($)</label><input type="number" id="wd-momo-amount" placeholder="Min $10,000" min="10000" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <button class="btn btn-primary" style="width:100%;" onclick="doWithdraw('mobile')">💸 REQUEST MOMO WITHDRAWAL</button>
+      </div>
+
+      <!-- PAYPAL FORM -->
+      <div id="wdf-paypal" class="wd-form" style="display:none;">
+        <div style="background:rgba(0,102,192,0.1);border:1px solid rgba(0,102,192,0.4);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:#4ea8f7;margin-bottom:0.5rem;">💳 PAYPAL WITHDRAWAL</div>
+          <p style="font-size:0.78rem;opacity:0.6;line-height:1.6;">Enter your PayPal email. We'll send funds via PayPal Friends & Family. Processing: 24–48 hours.</p>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">PAYPAL EMAIL ADDRESS</label><input type="email" id="wd-pp-email" placeholder="your@paypal.com" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">CONFIRM PAYPAL EMAIL</label><input type="email" id="wd-pp-email2" placeholder="Repeat email" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">FULL NAME ON PAYPAL ACCOUNT</label><input type="text" id="wd-pp-name" placeholder="e.g. John Doe" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">AMOUNT TO WITHDRAW ($)</label><input type="number" id="wd-pp-amount" placeholder="Min $10,000" min="10000" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <button class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,#003087,#009cde);" onclick="doWithdraw('paypal')">💳 REQUEST PAYPAL WITHDRAWAL</button>
+      </div>
+
+      <!-- BANK FORM -->
+      <div id="wdf-bank" class="wd-form" style="display:none;">
+        <div style="background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.3);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--gold);margin-bottom:0.5rem;">🏦 BANK TRANSFER</div>
+          <p style="font-size:0.78rem;opacity:0.6;line-height:1.6;">Direct bank wire. Processing: 2–5 business days. Fees may apply depending on your bank.</p>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">ACCOUNT HOLDER NAME</label><input type="text" id="wd-bk-name" placeholder="Full name on account" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">BANK NAME</label><input type="text" id="wd-bk-bank" placeholder="e.g. GCB Bank, Ecobank, GTBank..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">ACCOUNT NUMBER</label><input type="text" id="wd-bk-acc" placeholder="Your bank account number" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">BRANCH / SORT CODE / SWIFT (optional)</label><input type="text" id="wd-bk-code" placeholder="Branch code or SWIFT code" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">COUNTRY</label><input type="text" id="wd-bk-country" placeholder="e.g. Ghana, Nigeria, Kenya..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">AMOUNT TO WITHDRAW ($)</label><input type="number" id="wd-bk-amount" placeholder="Min $10,000" min="10000" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <button class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,var(--gold),#cc8800);color:#000;" onclick="doWithdraw('bank')">🏦 REQUEST BANK TRANSFER</button>
+      </div>
+
+      <!-- CRYPTO FORM -->
+      <div id="wdf-crypto" class="wd-form" style="display:none;">
+        <div style="background:rgba(255,140,0,0.07);border:1px solid rgba(255,140,0,0.3);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:orange;margin-bottom:0.5rem;">₿ CRYPTO WITHDRAWAL</div>
+          <p style="font-size:0.78rem;opacity:0.6;line-height:1.6;">We support BTC, ETH, USDT (TRC20/ERC20), BNB. Double-check your wallet address — crypto transfers are irreversible.</p>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">SELECT CRYPTOCURRENCY</label>
+          <select id="wd-cr-coin" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;">
+            <option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="USDT-TRC20">USDT (TRC20 - Tron)</option><option value="USDT-ERC20">USDT (ERC20 - Ethereum)</option><option value="BNB">BNB (BEP20)</option>
+          </select>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">YOUR WALLET ADDRESS</label><input type="text" id="wd-cr-addr" placeholder="0x... or bc1... or T..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">CONFIRM WALLET ADDRESS</label><input type="text" id="wd-cr-addr2" placeholder="Paste again to confirm" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">AMOUNT TO WITHDRAW ($)</label><input type="number" id="wd-cr-amount" placeholder="Min $10,000" min="10000" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div style="background:rgba(255,50,50,0.07);border:1px solid rgba(255,50,50,0.3);border-radius:8px;padding:0.7rem;margin-bottom:1rem;font-size:0.75rem;color:#ff8080;">⚠️ Crypto is irreversible. Triple-check your address and network before submitting.</div>
+        <button class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,#f7931a,#e8730a);" onclick="doWithdraw('crypto')">₿ REQUEST CRYPTO WITHDRAWAL</button>
+      </div>
+
+      <!-- AIRTIME FORM -->
+      <div id="wdf-airtime" class="wd-form" style="display:none;">
+        <div style="background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--neon-green);margin-bottom:0.5rem;">📶 AIRTIME WITHDRAWAL</div>
+          <p style="font-size:0.78rem;opacity:0.6;line-height:1.6;">Receive your earnings as mobile airtime/data. Quick processing within 1–6 hours.</p>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">PHONE NUMBER</label>
+          <div style="display:flex;gap:0.5rem;">
+            <select id="wd-air-code" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;">
+              <option value="+233">🇬🇭 +233</option><option value="+234">🇳🇬 +234</option><option value="+254">🇰🇪 +254</option>
+            </select>
+            <input type="tel" id="wd-air-num" placeholder="0XX XXX XXXX" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;"/>
+          </div>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">NETWORK</label>
+          <select id="wd-air-net" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;">
+            <option>MTN</option><option>Telecel/Vodafone</option><option>AirtelTigo</option><option>Airtel (Nigeria)</option><option>Glo</option><option>Safaricom</option>
+          </select>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">AMOUNT IN $ (converts to local airtime)</label><input type="number" id="wd-air-amount" placeholder="Min $10,000" min="10000" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <button class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,var(--neon-green),#008844);color:#000;" onclick="doWithdraw('airtime')">📶 REQUEST AIRTIME</button>
+      </div>
+
+      <!-- BINANCE FORM -->
+      <div id="wdf-binance" class="wd-form" style="display:none;">
+        <div style="background:rgba(240,185,11,0.07);border:1px solid rgba(240,185,11,0.3);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:#f0b90b;margin-bottom:0.5rem;">🟡 BINANCE PAY WITHDRAWAL</div>
+          <p style="font-size:0.78rem;opacity:0.6;line-height:1.6;">Withdraw directly to your Binance account using your Binance Pay ID or email.</p>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">BINANCE PAY ID or REGISTERED EMAIL</label><input type="text" id="wd-bn-id" placeholder="Binance Pay ID or your@email.com" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">CURRENCY TO RECEIVE</label>
+          <select id="wd-bn-cur" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;">
+            <option>USDT</option><option>BNB</option><option>BUSD</option><option>BTC</option>
+          </select>
+        </div>
+        <div class="field"><label style="font-size:0.72rem;letter-spacing:1px;opacity:0.6;">AMOUNT TO WITHDRAW ($)</label><input type="number" id="wd-bn-amount" placeholder="Min $10,000" min="10000" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;"/></div>
+        <button class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,#f0b90b,#c89009);color:#000;" onclick="doWithdraw('binance')">🟡 REQUEST BINANCE WITHDRAWAL</button>
+      </div>
+
+      <p style="font-size:0.7rem;opacity:0.4;text-align:center;margin-top:1rem;">🔒 All withdrawals are reviewed and processed securely. Fraud/multiple accounts = permanent ban.</p>
+    </div>
+  </div>
+
+</div><!-- end .section -->
+
+<!-- RECEIPT MODAL -->
+<div class="modal-overlay" id="receipt-modal">
+  <div class="modal-box" style="max-width:440px;position:relative;">
+    <button class="modal-close" onclick="document.getElementById('receipt-modal').classList.remove('open')">✕</button>
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-size:2.5rem;margin-bottom:0.5rem;">🧾</div>
+      <div style="font-family:'Orbitron',monospace;color:var(--neon-green);font-size:1rem;letter-spacing:2px;">WITHDRAWAL RECEIPT</div>
+      <div style="font-size:0.72rem;opacity:0.4;margin-top:0.3rem;">NEXUS PLATFORM — BY JOKSONX</div>
+    </div>
+    <div style="background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:1.2rem;font-family:'Share Tech Mono',monospace;font-size:0.8rem;line-height:2;">
+      <div style="display:flex;justify-content:space-between;"><span style="opacity:0.5;">REF NO.</span><span id="rcpt-ref" style="color:var(--cyan);"></span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="opacity:0.5;">DATE</span><span id="rcpt-date"></span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="opacity:0.5;">METHOD</span><span id="rcpt-method" style="color:var(--gold);"></span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="opacity:0.5;">ACCOUNT</span><span id="rcpt-account"></span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="opacity:0.5;">AMOUNT</span><span id="rcpt-amount" style="color:var(--neon-green);font-size:1rem;"></span></div>
+      <div style="border-top:1px solid var(--border);margin:0.5rem 0;"></div>
+      <div style="display:flex;justify-content:space-between;"><span style="opacity:0.5;">STATUS</span><span style="color:orange;">⏳ PENDING REVIEW</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="opacity:0.5;">ETA</span><span>24–72 HOURS</span></div>
+    </div>
+    <p style="font-size:0.72rem;opacity:0.5;text-align:center;margin-top:1rem;line-height:1.6;">Screenshot this receipt as proof of your withdrawal request. You will be contacted when it is processed.</p>
+    <button class="btn btn-primary" style="width:100%;margin-top:1rem;" onclick="document.getElementById('receipt-modal').classList.remove('open')">✅ DONE</button>
+  </div>
+</div>
+
+<!-- BUY MACHINE MODAL -->
+<div class="modal-overlay" id="buy-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeBuyModal()">✕</button>
+    <div class="modal-title" id="buy-modal-title">BUY MACHINE</div>
+    <div id="buy-modal-body">
+      <div class="pay-step">
+        <div class="pay-step-num">STEP 1 — SEND PAYMENT</div>
+        <div style="font-size:0.85rem;opacity:0.85;line-height:1.7;">Send exactly <strong id="buy-amount-display" style="color:var(--gold);"></strong> via <strong>MTN Mobile Money</strong>.</div>
+        <div style="text-align:center;margin:0.8rem 0;" id="momo-reveal-zone">
+          <button class="btn btn-gold" style="font-size:0.8rem;padding:10px 24px;" onclick="revealPaymentNumber()">🔒 REVEAL PAYMENT NUMBER</button>
+          <div style="font-size:0.72rem;opacity:0.5;margin-top:0.4rem;">Click to reveal the MoMo number</div>
+        </div>
+        <div id="momo-number-zone" style="display:none;text-align:center;margin:0.8rem 0;">
+          <div class="momo-number" id="momo-display-num">••••••••••</div>
+          <div style="font-size:0.72rem;opacity:0.5;margin-top:0.4rem;">MTN Mobile Money • Ghana</div>
+          <button class="btn btn-outline" style="margin-top:0.5rem;font-size:0.68rem;" onclick="copyMomoNumber()">📋 COPY NUMBER</button>
+        </div>
+        <div style="font-size:0.82rem;opacity:0.8;">Reference/Note: <strong style="color:var(--cyan);">NEXUS MINER</strong></div>
+      </div>
+      <div class="pay-step">
+        <div class="pay-step-num">STEP 2 — SUBMIT PROOF</div>
+        <div style="font-size:0.85rem;opacity:0.8;line-height:1.6;">After sending, fill in your details below. Your machine activates within 1–24 hours.</div>
+      </div>
+      <div class="field"><label style="font-size:0.7rem;letter-spacing:1px;opacity:0.6;">YOUR NAME</label><input type="text" id="buy-name" placeholder="Full name..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.9rem;"/></div>
+      <div class="field"><label style="font-size:0.7rem;letter-spacing:1px;opacity:0.6;">YOUR PHONE / EMAIL</label><input type="text" id="buy-contact" placeholder="Contact for confirmation..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.9rem;"/></div>
+      <div class="field"><label style="font-size:0.7rem;letter-spacing:1px;opacity:0.6;">TRANSACTION ID / REFERENCE</label><input type="text" id="buy-txid" placeholder="MoMo transaction ID..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.9rem;"/></div>
+      <input type="hidden" id="buy-machine-name"/>
+      <button class="btn btn-gold" style="width:100%;" onclick="submitPurchase()">✅ SUBMIT PAYMENT PROOF</button>
+      <div style="margin-top:1rem;padding:0.8rem;background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.2);border-radius:8px;font-size:0.73rem;opacity:0.6;line-height:1.7;">
+        ⚠️ Only submit after sending. Fake submissions are ignored. Contact via WhatsApp using the revealed number above for questions.
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6 — AGE 15 | ALL RIGHTS RESERVED</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script src="js/premium.js"></script>
+<script>
+// ============================================================
+// NEXUS EARN ENGINE — JoksonX
+// Python-inspired data modeling, SQL-style queries, JS runtime
+// ============================================================
+
+/* --- WALLET ENGINE (JS + Python-like functional patterns) --- */
+const EarnEngine = {
+  // Python-style data class simulation
+  _data: () => ({
+    wallet: parseFloat(localStorage.getItem('nexus_wallet')||'0'),
+    clicks: parseInt(localStorage.getItem('nexus_clicks')||'0'),
+    adEarned: parseFloat(localStorage.getItem('nx_ad_earned')||'0'),
+    bonusEarned: parseFloat(localStorage.getItem('nx_bonus_earned')||'0'),
+    streak: parseInt(localStorage.getItem('nx_streak')||'0'),
+    lastDay: localStorage.getItem('nx_last_day')||'',
+  }),
+
+  // Python-style setter
+  _save(key, val) { localStorage.setItem(key, val); },
+
+  getWallet() { return this._data().wallet; },
+  setWallet(v) { this._save('nexus_wallet', v.toFixed(4)); },
+  addToWallet(v) {
+    const mult = typeof NEXUS_PREMIUM !== 'undefined' ? NEXUS_PREMIUM.getMiningMultiplier() : 1;
+    const earned = v * mult;
+    this.setWallet(this.getWallet() + earned);
+    return earned;
+  },
+
+  // SQL-style machine query
+  queryMachines() {
+    const MACHINES = ['LITE','PRO','ULTRA','QUANTUM','GALAXY','MASTER'];
+    return MACHINES.filter(m => localStorage.getItem('mach_'+m) === '1').map(m => ({
+      id: m,
+      since: parseInt(localStorage.getItem('mach_'+m+'_t')||'0'),
+      rate: {LITE:0.5,PRO:1.2,ULTRA:3.0,QUANTUM:8.0,GALAXY:20.0,MASTER:50.0}[m]
+    }));
+  },
+
+  // Python-style list comprehension simulation
+  totalMinerEarnings() {
+    return this.queryMachines().reduce((sum, m) => {
+      const hrs = (Date.now() - m.since) / 3600000;
+      const mult = typeof NEXUS_PREMIUM !== 'undefined' ? NEXUS_PREMIUM.getMiningMultiplier() : 1;
+      return sum + parseFloat((hrs * m.rate * mult).toFixed(4));
+    }, 0);
+  },
+
+  addClick() {
+    const d = this._data();
+    const mult = typeof NEXUS_PREMIUM !== 'undefined' ? NEXUS_PREMIUM.getMiningMultiplier() : 1;
+    const earned = 0.01 * mult;
+    const newClicks = d.clicks + 1;
+    this._save('nexus_clicks', newClicks);
+    this.setWallet(d.wallet + earned);
+    this._save('nx_ad_earned', (d.adEarned + earned).toFixed(4));
+    this._updateStreak();
+    return { clicks: newClicks, earned };
+  },
+
+  _updateStreak() {
+    const today = new Date().toDateString();
+    const d = this._data();
+    if (d.lastDay !== today) {
+      const yesterday = new Date(Date.now()-86400000).toDateString();
+      const newStreak = d.lastDay === yesterday ? d.streak + 1 : 1;
+      this._save('nx_streak', newStreak);
+      this._save('nx_last_day', today);
+      if (newStreak > 1) {
+        toast(`🔥 ${newStreak}-day streak! Bonus +$0.10!`, 'success');
+        this.setWallet(this.getWallet() + 0.10);
+        this._save('nx_bonus_earned', (parseFloat(localStorage.getItem('nx_bonus_earned')||'0')+0.10).toFixed(2));
+      }
+    }
+  },
+
+  hasMachine(n) { return localStorage.getItem('mach_'+n)==='1'; },
+  buyMachine(n) {
+    this._save('mach_'+n,'1');
+    this._save('mach_'+n+'_t', Date.now());
+  }
+};
+
+/* --- UI UPDATE ENGINE --- */
+let _selectedMethod='', _buyingMachine='', _buyingPrice='';
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.earn-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  updateUI();
+  if(name==='spin') initSpinWheel();
+  if(name==='tasks') initTasks();
+  if(name==='referral') initReferral();
+}
+
+function updateUI(){
+  const d = EarnEngine._data();
+  const bal = EarnEngine.getWallet();
+  const mineTotal = EarnEngine.totalMinerEarnings();
+  const bonus = parseFloat(localStorage.getItem('nx_bonus_earned')||'0');
+
+  // Wallet displays
+  ['wallet-display','wallet-display2','withdraw-bal'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=bal.toFixed(4);
+  });
+
+  const prog=document.getElementById('earn-progress');
+  const minWd = (typeof NEXUS_PREMIUM!=='undefined'&&NEXUS_PREMIUM.isPremium()) ? 5000 : 10000;
+  if(prog) prog.style.width=Math.min(100,(bal/minWd)*100)+'%';
+
+  const ce=document.getElementById('click-display');if(ce)ce.textContent=d.clicks.toLocaleString();
+  const tcd=document.getElementById('total-clicks-display');if(tcd)tcd.textContent=d.clicks.toLocaleString();
+  const cn=document.getElementById('clicks-needed');if(cn)cn.textContent=Math.max(0,1000000-d.clicks).toLocaleString();
+  const te=document.getElementById('today-earned');if(te)te.textContent='$'+(d.adEarned).toFixed(2);
+  const sd=document.getElementById('streak-display');if(sd)sd.textContent=d.streak+'🔥';
+  const ae=document.getElementById('ad-earned');if(ae)ae.textContent='$'+parseFloat(d.adEarned).toFixed(2);
+  const me=document.getElementById('mine-earned');if(me)me.textContent='$'+mineTotal.toFixed(4);
+  const be=document.getElementById('bonus-earned');if(be)be.textContent='$'+bonus.toFixed(2);
+
+  // Premium banner
+  if(typeof NEXUS_PREMIUM!=='undefined'&&NEXUS_PREMIUM.isPremium()){
+    const banner=document.getElementById('premium-earn-banner');
+    if(banner) banner.style.display='block';
+    const md=document.getElementById('prem-mult-display');if(md)md.textContent=NEXUS_PREMIUM.getMiningMultiplier()+'x';
+    const dd=document.getElementById('prem-days-disp');if(dd)dd.textContent=NEXUS_PREMIUM.daysLeft();
+    const cm=document.getElementById('click-mult');if(cm)cm.textContent=NEXUS_PREMIUM.getMiningMultiplier()+'x';
+    // Update quantum/galaxy/master buttons
+    const tier=NEXUS_PREMIUM.getTier();
+    const tierOrder={BASIC:1,PRO:2,ELITE:3,LIFETIME:4};
+    const tLevel=tierOrder[tier]||0;
+    const qg=document.getElementById('quantum-gate');
+    if(qg&&tLevel>=2) qg.innerHTML=`<button class="btn btn-gold" style="width:100%;background:linear-gradient(135deg,#ffd700,#ff8800);" onclick="openBuyModal('QUANTUM','NEXUS QUANTUM MINER','60.00','8.00')">🛒 BUY QUANTUM — $60</button>`;
+    const gb=document.getElementById('btn-GALAXY');
+    if(gb&&tLevel>=3) gb.innerHTML=`<button class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,var(--cyan),var(--magenta));" onclick="openBuyModal('GALAXY','NEXUS GALAXY MINER','120.00','20.00')">🛒 BUY GALAXY — $120</button>`;
+    const mb=document.getElementById('btn-MASTER');
+    if(mb&&tLevel>=4) mb.innerHTML=`<button class="btn btn-gold" style="width:100%;" onclick="openBuyModal('MASTER','NEXUS MASTER MINER','250.00','50.00')">🛒 BUY MASTER — $250</button>`;
+  }
+
+  // Machine owned states
+  ['LITE','PRO','ULTRA','QUANTUM','GALAXY','MASTER'].forEach(n=>{
+    const btn=document.getElementById('btn-'+n);
+    if(EarnEngine.hasMachine(n)&&btn&&!btn.querySelector('.machine-owned')){
+      const keep=n==='QUANTUM'||n==='GALAXY'||n==='MASTER';
+      if(!keep) btn.innerHTML='<span class="machine-owned">✅ OWNED — MINING ACTIVE</span>';
+    }
+  });
+
+  renderActiveMiners();
+}
+
+function renderActiveMiners(){
+  const list=document.getElementById('active-miners-list');
+  const section=document.getElementById('active-miners-section');
+  const owned=EarnEngine.queryMachines();
+  if(!section||!list) return;
+  if(owned.length===0){section.style.display='none';return;}
+  section.style.display='block';
+  const mult = typeof NEXUS_PREMIUM!=='undefined' ? NEXUS_PREMIUM.getMiningMultiplier() : 1;
+  const icons={LITE:'🔧',PRO:'⚙️',ULTRA:'🚀',QUANTUM:'⚛️',GALAXY:'🌌',MASTER:'👑'};
+  list.innerHTML=owned.map(m=>{
+    const hrs=(Date.now()-m.since)/3600000;
+    const earned=(hrs*m.rate*mult).toFixed(4);
+    const fillPct=(Date.now()%3600000)/36000;
+    return`<div class="active-miner-card">
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <span style="font-size:2.5rem;">${icons[m.id]||'⚙️'}</span>
+        <div style="flex:1;text-align:left;">
+          <div style="font-family:'Orbitron',monospace;color:var(--gold);font-size:0.88rem;">NEXUS ${m.id} MINER — ACTIVE</div>
+          <div style="font-size:0.73rem;color:var(--neon-green);font-family:'Share Tech Mono',monospace;">⚡ $${m.rate}/hr × ${mult}x = $${(m.rate*mult).toFixed(2)}/hr</div>
+        </div>
+        <div style="font-family:'Orbitron',monospace;font-size:1.3rem;color:var(--cyan);">$${earned}</div>
+      </div>
+      <div class="mine-bar"><div class="mine-fill" style="width:${fillPct}%;"></div></div>
+      <div style="font-size:0.68rem;opacity:0.45;font-family:'Share Tech Mono',monospace;">MINING IN PROGRESS — AUTO-DEPOSITS TO WALLET</div>
+    </div>`;
+  }).join('');
+}
+
+/* --- AD CLICK --- */
+function clickAd(event){
+  const r=EarnEngine.addClick();
+  updateUI();
+  const coin=document.createElement('div');
+  coin.className='coin-anim';coin.textContent='💰';
+  coin.style.position='fixed';coin.style.left=(event.clientX||window.innerWidth/2)+'px';coin.style.top=(event.clientY||200)+'px';coin.style.zIndex=9999;coin.style.fontSize='1.5rem';coin.style.pointerEvents='none';
+  coin.style.animation='coin-fly 1s ease-out forwards';
+  document.body.appendChild(coin);setTimeout(()=>coin.remove(),1100);
+  document.getElementById('ad-zone')?.classList.add('clicked');
+  setTimeout(()=>document.getElementById('ad-zone')?.classList.remove('clicked'),300);
+  if(r.clicks===1000)toast('🎉 1,000 clicks! $10 earned!','success');
+  if(r.clicks===10000)toast('💎 10,000 clicks! $100 earned!','success');
+  if(r.clicks===50000)toast('🚀 50,000 clicks! $500 earned!','success');
+  if(r.clicks===100000)toast('🔥 100K clicks! $1,000 earned!','success');
+  if(r.clicks===500000)toast('⭐ 500K clicks! Halfway there! $5,000 earned!','success');
+  if(r.clicks===1000000)toast('🏆 1,000,000 CLICKS! $10,000 UNLOCKED! Withdraw now!','success');
+}
+
+/* --- PAYMENT REVEAL --- */
+function revealPaymentNumber(){
+  // Number stored as split base64 — never visible in plain source
+  const segments=['MDI0', 'NTE4', 'NjQ0', 'OQ=='];
+  const num=segments.map(s=>atob(s)).join('');
+  document.getElementById('momo-reveal-zone').style.display='none';
+  document.getElementById('momo-number-zone').style.display='block';
+  document.getElementById('momo-display-num').textContent=num;
+  window._activePayNum=num;
+}
+function copyMomoNumber(){
+  const n=window._activePayNum;
+  if(n) navigator.clipboard.writeText(n).then(()=>toast('✅ Number copied!','success')).catch(()=>toast('Number: '+n));
+}
+
+/* --- BUY MACHINE MODAL --- */
+function openBuyModal(machineId,machineName,price,rate){
+  _buyingMachine=machineId;_buyingPrice=price;
+  document.getElementById('buy-modal-title').textContent='🛒 BUY '+machineName;
+  document.getElementById('buy-amount-display').textContent='$'+price+' USD (GHS equivalent)';
+  document.getElementById('buy-machine-name').value=machineName;
+  document.getElementById('momo-reveal-zone').style.display='block';
+  document.getElementById('momo-number-zone').style.display='none';
+  document.getElementById('buy-modal').classList.add('open');
+}
+function closeBuyModal(){document.getElementById('buy-modal').classList.remove('open');}
+
+function submitPurchase(){
+  const name=document.getElementById('buy-name').value.trim();
+  const contact=document.getElementById('buy-contact').value.trim();
+  const txid=document.getElementById('buy-txid').value.trim();
+  if(!name){toast('Enter your name!','error');return;}
+  if(!contact){toast('Enter your contact!','error');return;}
+  if(!txid){toast('Enter the transaction ID!','error');return;}
+  EarnEngine.buyMachine(_buyingMachine);
+  toast('✅ Submitted! Machine activating after verification. Check back soon!','success');
+  closeBuyModal();
+  updateUI();
+  setTimeout(()=>switchTab('machines',document.querySelectorAll('.earn-tab')[1]),1200);
+}
+
+/* --- PREMIUM MACHINE ACCESS GATES --- */
+function checkQuantumAccess(){
+  if(typeof NEXUS_PREMIUM!=='undefined'&&NEXUS_PREMIUM.isPremium()){
+    openBuyModal('QUANTUM','NEXUS QUANTUM MINER','60.00','8.00');
+  } else {
+    toast('⭐ NEXUS PRO or higher required for Quantum Miner!','error');
+    setTimeout(()=>openPremiumModal(),500);
+  }
+}
+function checkGalaxyAccess(){
+  if(typeof NEXUS_PREMIUM!=='undefined'&&NEXUS_PREMIUM.getTier()&&['ELITE','LIFETIME'].includes(NEXUS_PREMIUM.getTier())){
+    openBuyModal('GALAXY','NEXUS GALAXY MINER','120.00','20.00');
+  } else {
+    toast('💎 NEXUS ELITE or LIFETIME required for Galaxy Miner!','error');
+    setTimeout(()=>openPremiumModal(),500);
+  }
+}
+function checkMasterAccess(){
+  if(typeof NEXUS_PREMIUM!=='undefined'&&NEXUS_PREMIUM.getTier()==='LIFETIME'){
+    openBuyModal('MASTER','NEXUS MASTER MINER','250.00','50.00');
+  } else {
+    toast('🏆 NEXUS LIFETIME required for Master Miner!','error');
+    setTimeout(()=>openPremiumModal(),500);
+  }
+}
+
+/* --- WITHDRAW --- */
+function selMethod(el,m){
+  document.querySelectorAll('.method-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');_selectedMethod=m;
+  // Hide all forms first
+  document.querySelectorAll('.wd-form').forEach(f=>f.style.display='none');
+  // Show relevant form
+  const map={MoMo:'mobile',Telecel:'mobile',AirtelTigo:'mobile',PayPal:'paypal',Bank:'bank',Crypto:'crypto',Airtime:'airtime',Binance:'binance'};
+  const formId='wdf-'+(map[m]||'mobile');
+  const form=document.getElementById(formId);
+  if(form){form.style.display='block';form.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  // Update MoMo network dropdown if applicable
+  if(m==='MoMo'&&document.getElementById('wd-momo-net')) document.getElementById('wd-momo-net').value='MTN MoMo';
+  if(m==='Telecel'&&document.getElementById('wd-momo-net')) document.getElementById('wd-momo-net').value='Telecel Cash';
+  if(m==='AirtelTigo'&&document.getElementById('wd-momo-net')) document.getElementById('wd-momo-net').value='AirtelTigo Money';
+}
+
+function _genRef(){return 'NX-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).substr(2,4).toUpperCase();}
+
+function _showReceipt(method,account,amount){
+  const ref=_genRef();
+  const now=new Date();
+  document.getElementById('rcpt-ref').textContent=ref;
+  document.getElementById('rcpt-date').textContent=now.toLocaleString();
+  document.getElementById('rcpt-method').textContent=method;
+  document.getElementById('rcpt-account').textContent=account;
+  document.getElementById('rcpt-amount').textContent='$'+parseFloat(amount).toFixed(2);
+  document.getElementById('receipt-modal').classList.add('open');
+  // Save to localStorage history
+  const hist=JSON.parse(localStorage.getItem('nx_wd_history')||'[]');
+  hist.unshift({ref,method,account,amount,date:now.toISOString(),status:'pending'});
+  localStorage.setItem('nx_wd_history',JSON.stringify(hist.slice(0,50)));
+}
+
+function doWithdraw(type){
+  const bal=EarnEngine.getWallet();
+  const isPrem=typeof NEXUS_PREMIUM!=='undefined'&&NEXUS_PREMIUM.isPremium();
+  const minWd=isPrem?5000:10000;
+  if(bal<minWd){toast('You need $'+(minWd-bal).toFixed(2)+' more to withdraw! (Min: $'+minWd+')','error');return;}
+
+  if(type==='mobile'){
+    const name=document.getElementById('wd-momo-name').value.trim();
+    const code=document.getElementById('wd-momo-code').value;
+    const num=document.getElementById('wd-momo-num').value.trim();
+    const net=document.getElementById('wd-momo-net').value;
+    const amt=parseFloat(document.getElementById('wd-momo-amount').value);
+    if(!name){toast('Enter account holder name','error');return;}
+    if(!num){toast('Enter your MoMo phone number','error');return;}
+    if(!amt||amt<minWd){toast('Minimum withdrawal is $'+minWd,'error');return;}
+    if(amt>bal){toast('Insufficient balance!','error');return;}
+    toast('✅ '+net+' withdrawal submitted!','success');
+    setTimeout(()=>{EarnEngine.setWallet(bal-amt);updateUI();_showReceipt(net,code+num,amt);},1500);
+  }
+  else if(type==='paypal'){
+    const email=document.getElementById('wd-pp-email').value.trim();
+    const email2=document.getElementById('wd-pp-email2').value.trim();
+    const name=document.getElementById('wd-pp-name').value.trim();
+    const amt=parseFloat(document.getElementById('wd-pp-amount').value);
+    if(!email){toast('Enter your PayPal email','error');return;}
+    if(email!==email2){toast('PayPal emails do not match','error');return;}
+    if(!name){toast('Enter name on PayPal account','error');return;}
+    if(!amt||amt<minWd){toast('Minimum withdrawal is $'+minWd,'error');return;}
+    if(amt>bal){toast('Insufficient balance!','error');return;}
+    toast('✅ PayPal withdrawal submitted!','success');
+    setTimeout(()=>{EarnEngine.setWallet(bal-amt);updateUI();_showReceipt('PayPal',email,amt);},1500);
+  }
+  else if(type==='bank'){
+    const name=document.getElementById('wd-bk-name').value.trim();
+    const bank=document.getElementById('wd-bk-bank').value.trim();
+    const acc=document.getElementById('wd-bk-acc').value.trim();
+    const amt=parseFloat(document.getElementById('wd-bk-amount').value);
+    if(!name){toast('Enter account holder name','error');return;}
+    if(!bank){toast('Enter your bank name','error');return;}
+    if(!acc){toast('Enter your account number','error');return;}
+    if(!amt||amt<minWd){toast('Minimum withdrawal is $'+minWd,'error');return;}
+    if(amt>bal){toast('Insufficient balance!','error');return;}
+    toast('✅ Bank transfer request submitted!','success');
+    setTimeout(()=>{EarnEngine.setWallet(bal-amt);updateUI();_showReceipt('Bank Wire — '+bank,acc,amt);},1500);
+  }
+  else if(type==='crypto'){
+    const coin=document.getElementById('wd-cr-coin').value;
+    const addr=document.getElementById('wd-cr-addr').value.trim();
+    const addr2=document.getElementById('wd-cr-addr2').value.trim();
+    const amt=parseFloat(document.getElementById('wd-cr-amount').value);
+    if(!addr){toast('Enter your wallet address','error');return;}
+    if(addr!==addr2){toast('Wallet addresses do not match','error');return;}
+    if(!amt||amt<minWd){toast('Minimum withdrawal is $'+minWd,'error');return;}
+    if(amt>bal){toast('Insufficient balance!','error');return;}
+    toast('✅ Crypto withdrawal request submitted!','success');
+    setTimeout(()=>{EarnEngine.setWallet(bal-amt);updateUI();_showReceipt(coin,addr.substr(0,12)+'...'+addr.substr(-6),amt);},1500);
+  }
+  else if(type==='airtime'){
+    const code=document.getElementById('wd-air-code').value;
+    const num=document.getElementById('wd-air-num').value.trim();
+    const net=document.getElementById('wd-air-net').value;
+    const amt=parseFloat(document.getElementById('wd-air-amount').value);
+    if(!num){toast('Enter your phone number','error');return;}
+    if(!amt||amt<minWd){toast('Minimum withdrawal is $'+minWd,'error');return;}
+    if(amt>bal){toast('Insufficient balance!','error');return;}
+    toast('✅ Airtime request submitted!','success');
+    setTimeout(()=>{EarnEngine.setWallet(bal-amt);updateUI();_showReceipt('Airtime — '+net,code+num,amt);},1500);
+  }
+  else if(type==='binance'){
+    const id=document.getElementById('wd-bn-id').value.trim();
+    const cur=document.getElementById('wd-bn-cur').value;
+    const amt=parseFloat(document.getElementById('wd-bn-amount').value);
+    if(!id){toast('Enter your Binance Pay ID or email','error');return;}
+    if(!amt||amt<minWd){toast('Minimum withdrawal is $'+minWd,'error');return;}
+    if(amt>bal){toast('Insufficient balance!','error');return;}
+    toast('✅ Binance withdrawal submitted!','success');
+    setTimeout(()=>{EarnEngine.setWallet(bal-amt);updateUI();_showReceipt('Binance Pay — '+cur,id,amt);},1500);
+  }
+}
+
+/* --- DAILY TASKS (using object-oriented pattern) --- */
+class TaskEngine {
+  constructor() {
+    this.tasks = [
+      {id:'t1',icon:'📢',label:'Click 10 Ads',reward:0.10,target:10,key:'nexus_clicks',premium:false},
+      {id:'t2',icon:'🎮',label:'Play a Game',reward:0.10,target:1,key:'task_played_game',premium:false},
+      {id:'t3',icon:'🤖',label:'Use AI Tools',reward:0.05,target:1,key:'task_used_ai',premium:false},
+      {id:'t4',icon:'🔍',label:'Search Something',reward:0.05,target:1,key:'task_searched',premium:false},
+      {id:'t5',icon:'💬',label:'Open Chat',reward:0.05,target:1,key:'task_opened_chat',premium:false},
+      {id:'t6',icon:'🎬',label:'Browse Movies',reward:0.05,target:1,key:'task_browsed_movies',premium:false},
+      {id:'t7',icon:'💰',label:'Click 50 Ads',reward:0.50,target:50,key:'nexus_clicks',premium:false},
+      {id:'t8',icon:'🏆',label:'Click 200 Ads',reward:2.00,target:200,key:'nexus_clicks',premium:false},
+      {id:'t9',icon:'⭐',label:'Upgrade to Premium',reward:5.00,target:1,key:'nx_premium_exp',premium:false,custom:true},
+      {id:'t10',icon:'👥',label:'Share Referral Code',reward:0.25,target:1,key:'task_shared_ref',premium:true},
+      {id:'t11',icon:'🌌',label:'Click 500 Ads',reward:5.00,target:500,key:'nexus_clicks',premium:true},
+    ];
+  }
+
+  getProgress(task) {
+    if(task.custom) return parseInt(localStorage.getItem(task.key)||'0')>Date.now() ? 1 : 0;
+    return Math.min(parseInt(localStorage.getItem(task.key)||'0'), task.target);
+  }
+
+  isClaimed(task) { return localStorage.getItem('claimed_'+task.id)==='1'; }
+
+  claim(taskId) {
+    const task = this.tasks.find(t=>t.id===taskId);
+    if(!task||this.isClaimed(task)) return;
+    if(this.getProgress(task)<task.target) { toast('Task not complete yet!','error'); return; }
+    localStorage.setItem('claimed_'+task.id,'1');
+    EarnEngine.setWallet(EarnEngine.getWallet()+task.reward);
+    localStorage.setItem('nx_bonus_earned',(parseFloat(localStorage.getItem('nx_bonus_earned')||'0')+task.reward).toFixed(2));
+    toast('🎉 Task claimed! +$'+task.reward.toFixed(2),'success');
+    initTasks(); updateUI();
+  }
+
+  render() {
+    const isPrem = typeof NEXUS_PREMIUM!=='undefined'&&NEXUS_PREMIUM.isPremium();
+    const list = document.getElementById('tasks-list');
+    if(!list) return;
+    list.innerHTML = this.tasks
+      .filter(t=>!t.premium||isPrem)
+      .map(t=>{
+        const prog=this.getProgress(t);
+        const done=prog>=t.target;
+        const claimed=this.isClaimed(t);
+        const pct=Math.min(100,(prog/t.target)*100);
+        const col=claimed?'var(--neon-green)':done?'var(--gold)':'var(--border)';
+        return`<div class="task-item" style="border:1px solid ${col};">
+          <span style="font-size:1.8rem;">${t.icon}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Orbitron',monospace;font-size:0.76rem;color:${done&&!claimed?'var(--gold)':'var(--text)'};">${t.label}${t.premium?'  <span class="premium-badge" style="font-size:0.5rem;">⭐ PREMIUM</span>':''}</div>
+            <div style="font-size:0.68rem;opacity:0.6;margin:0.2rem 0;">${Math.min(prog,t.target)}/${t.target} • +$${t.reward.toFixed(2)}</div>
+            <div class="task-progress"><div class="task-fill" style="width:${pct}%;background:${done?'var(--gold)':'var(--cyan)'};"></div></div>
+          </div>
+          <button class="btn ${claimed?'btn-outline':done?'btn-gold':'btn-outline'}" style="font-size:0.65rem;padding:7px 12px;white-space:nowrap;${claimed?'opacity:0.45;':''}" onclick="window._taskEngine.claim('${t.id}')" ${claimed?'disabled':''}>
+            ${claimed?'✅ CLAIMED':done?'🎁 CLAIM':'⏳ IN PROGRESS'}
+          </button>
+        </div>`;
+      }).join('');
+  }
+}
+window._taskEngine = new TaskEngine();
+function initTasks() { window._taskEngine.render(); }
+
+/* --- SPIN WHEEL (canvas-based) --- */
+const SPIN_PRIZES=[
+  {label:'$0.01',val:0.01,col:'#00f5ff'},{label:'$0.05',val:0.05,col:'#ff00ff'},
+  {label:'$0.10',val:0.10,col:'#ffd700'},{label:'TRY AGAIN',val:0,col:'#333'},
+  {label:'$0.25',val:0.25,col:'#39ff14'},{label:'$0.50',val:0.50,col:'#ff8800'},
+  {label:'TRY AGAIN',val:0,col:'#333'},{label:'$1.00',val:1.00,col:'#ff4444'},
+  {label:'$0.02',val:0.02,col:'#00f5ff'},{label:'$2.00',val:2.00,col:'#8800ff'},
+  {label:'TRY AGAIN',val:0,col:'#333'},{label:'$0.50',val:0.50,col:'#ff8800'},
+];
+let _spinAngle=0,_spinning=false;
+
+function initSpinWheel(){
+  drawWheel(0);
+  const isPrem=typeof NEXUS_PREMIUM!=='undefined'&&NEXUS_PREMIUM.isPremium();
+  const cooldown=isPrem?7200000:14400000; // 2hrs premium, 4hrs free
+  const last=parseInt(localStorage.getItem('last_spin')||'0');
+  const diff=Date.now()-last;
+  const avail=diff>cooldown;
+  const sl=document.getElementById('spins-left');if(sl)sl.textContent=avail?'1':'0';
+  const btn=document.getElementById('spin-btn');if(btn)btn.disabled=!avail;
+  const tt=document.getElementById('spin-timer-txt');if(tt)tt.textContent=isPrem?'2 hours':'4 hours';
+  if(!avail){
+    const rem=Math.ceil((cooldown-diff)/60000);
+    const cd=document.getElementById('spin-countdown');
+    if(cd){cd.style.display='block';cd.textContent=`⏰ Next spin in ${rem} minute${rem!==1?'s':''}${isPrem?' (Premium 2hr cooldown)':''}`;}
+    if(btn)btn.textContent=`⏳ ${rem}min left`;
+  }
+}
+
+function drawWheel(angle){
+  const canvas=document.getElementById('spin-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const cx=canvas.width/2,cy=canvas.height/2,r=cx-12;
+  const sl=Math.PI*2/SPIN_PRIZES.length;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  SPIN_PRIZES.forEach((p,i)=>{
+    const a=angle+i*sl;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a,a+sl);ctx.closePath();
+    ctx.fillStyle=p.col;ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,0.5)';ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(a+sl/2);
+    ctx.fillStyle='#fff';ctx.font='bold 10px Orbitron,monospace';
+    ctx.textAlign='right';ctx.shadowBlur=2;ctx.shadowColor='#000';
+    ctx.fillText(p.label,r-8,4);ctx.restore();
+  });
+  ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);
+  ctx.fillStyle='#020408';ctx.fill();
+  ctx.strokeStyle='var(--gold,#ffd700)';ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+r+4,cy);ctx.lineTo(cx+r-20,cy-10);ctx.lineTo(cx+r-20,cy+10);ctx.closePath();
+  ctx.fillStyle='#ffd700';ctx.fill();
+}
+
+function doSpin(){
+  const isPrem=typeof NEXUS_PREMIUM!=='undefined'&&NEXUS_PREMIUM.isPremium();
+  const cooldown=isPrem?7200000:14400000;
+  if(Date.now()-parseInt(localStorage.getItem('last_spin')||'0')<cooldown){toast('Come back later for your next spin!','error');return;}
+  if(_spinning)return;
+  _spinning=true;
+  const btn=document.getElementById('spin-btn');if(btn)btn.disabled=true;
+  const res=document.getElementById('spin-result');if(res)res.style.display='none';
+  // Weighted prize selection — premium gets better prizes
+  let targetIdx;
+  if(isPrem){
+    const premWeights=[3,4,4,1,5,5,1,5,3,3,1,5];
+    const total=premWeights.reduce((a,b)=>a+b,0);
+    let r=Math.random()*total;
+    targetIdx=0;
+    for(let i=0;i<premWeights.length;i++){r-=premWeights[i];if(r<=0){targetIdx=i;break;}}
+  } else {
+    const weights=[4,3,3,5,3,2,5,1,4,1,5,2];
+    const total=weights.reduce((a,b)=>a+b,0);
+    let r=Math.random()*total;
+    targetIdx=0;
+    for(let i=0;i<weights.length;i++){r-=weights[i];if(r<=0){targetIdx=i;break;}}
+  }
+  const sl=Math.PI*2/SPIN_PRIZES.length;
+  const targetAngle=Math.PI*2*6+(Math.PI*2-targetIdx*sl-sl/2);
+  let startTime=null,dur=4000,startAngle=_spinAngle;
+  function animate(ts){
+    if(!startTime)startTime=ts;
+    const prog=Math.min((ts-startTime)/dur,1);
+    const eased=1-Math.pow(1-prog,4);
+    _spinAngle=startAngle+targetAngle*eased;
+    drawWheel(_spinAngle);
+    if(prog<1){requestAnimationFrame(animate);return;}
+    _spinning=false;
+    localStorage.setItem('last_spin',Date.now());
+    const prize=SPIN_PRIZES[targetIdx];
+    if(res){
+      res.style.display='block';
+      if(prize.val>0){
+        EarnEngine.setWallet(EarnEngine.getWallet()+prize.val);
+        localStorage.setItem('nx_bonus_earned',(parseFloat(localStorage.getItem('nx_bonus_earned')||'0')+prize.val).toFixed(2));
+        res.textContent='🎉 YOU WON '+prize.label+'!';
+        res.style.color='var(--gold)';
+        toast('🎰 Lucky! You won '+prize.label,'success');
+        updateUI();
+      } else {
+        res.textContent='😔 Try Again — Spin later for a prize!';
+        res.style.color='rgba(200,230,240,0.5)';
+        toast('Spin again in '+(isPrem?'2':'4')+' hours','info');
+      }
+    }
+    initSpinWheel();
+  }
+  requestAnimationFrame(animate);
+}
+
+/* --- REFERRAL ENGINE --- */
+function initReferral(){
+  const code=localStorage.getItem('nexus_refcode')||('NX-'+Math.random().toString(36).substr(2,4).toUpperCase());
+  localStorage.setItem('nexus_refcode',code);
+  const el=document.getElementById('ref-code');if(el)el.textContent=code;
+  const refs=parseInt(localStorage.getItem('nexus_refs')||'0');
+  const re=document.getElementById('ref-earned');if(re)re.textContent='$'+(refs*2).toFixed(2);
+  const rc=document.getElementById('ref-count');if(rc)rc.textContent=refs;
+}
+function copyRefCode(){
+  const code=localStorage.getItem('nexus_refcode')||'NX-XXXX';
+  navigator.clipboard.writeText(code).then(()=>toast('✅ Code copied!','success')).catch(()=>toast('Code: '+code));
+}
+function submitRefCode(){
+  const code=document.getElementById('ref-input').value.trim().toUpperCase();
+  if(!code||!code.startsWith('NX-')){toast('Enter a valid referral code (NX-XXXX)','error');return;}
+  if(code===localStorage.getItem('nexus_refcode')){toast('You cannot use your own code!','error');return;}
+  if(localStorage.getItem('ref_used')==='1'){toast('You already redeemed a referral code!','error');return;}
+  localStorage.setItem('ref_used','1');
+  EarnEngine.setWallet(EarnEngine.getWallet()+2.00);
+  localStorage.setItem('nx_bonus_earned',(parseFloat(localStorage.getItem('nx_bonus_earned')||'0')+2.00).toFixed(2));
+  toast('🎉 Referral bonus! +$2.00 added to wallet!','success');
+  updateUI();
+}
+function shareRef(platform){
+  const code=localStorage.getItem('nexus_refcode')||'NX-XXXX';
+  const msg=encodeURIComponent(`Join NEXUS — the ultimate earning platform! Use my code ${code} to get $2 bonus! https://nexus.joksonx.com`);
+  const urls={whatsapp:'https://wa.me/?text='+msg,facebook:'https://www.facebook.com/sharer/sharer.php?u=https://nexus.joksonx.com&quote='+msg,twitter:'https://twitter.com/intent/tweet?text='+msg,telegram:'https://t.me/share/url?url=https://nexus.joksonx.com&text='+msg};
+  window.open(urls[platform],'_blank');
+  localStorage.setItem('task_shared_ref','1');
+}
+
+/* --- AI EARNER --- */
+async function askEarnAI(){
+  const inp=document.getElementById('ai-earn-input'),out=document.getElementById('ai-earn-output');
+  if(!inp.value.trim())return;
+  out.style.display='block';out.innerHTML='<span>⚡ NEXUS AI analyzing earning strategies...</span>';
+  const tier=typeof NEXUS_PREMIUM!=='undefined'?NEXUS_PREMIUM.getTier():'FREE';
+  const bal=EarnEngine.getWallet().toFixed(2);
+  const machines=EarnEngine.queryMachines().map(m=>m.id).join(',');
+  try{
+    const r=await nexusAI(
+      `You are NEXUS Earning AI, an expert financial advisor for the NEXUS platform. 
+      User data: Wallet=$${bal}, Plan=${tier}, Machines owned: ${machines||'none'}.
+      Give specific, actionable advice. Use numbers. Be motivating. Use emojis. 
+      Languages you can reference: JavaScript (wallet engine), Python (data models), SQL (database queries).`,
+      inp.value
+    );
+    out.innerHTML=r.replace(/\n/g,'<br>');
+  }catch(e){out.innerHTML='⚠️ Error — check connection.';}
+}
+async function quickAskEarn(q){
+  document.getElementById('ai-earn-input').value=q;
+  switchTab('aiearner',document.querySelectorAll('.earn-tab')[5]);
+  await askEarnAI();
+}
+
+/* --- EARNINGS PROJECTOR --- */
+function calcProjection(){
+  const rate=parseFloat(document.getElementById('proj-machine').value)||0;
+  const ads=parseInt(document.getElementById('proj-ads').value)||0;
+  const mult=typeof NEXUS_PREMIUM!=='undefined'?NEXUS_PREMIUM.getMiningMultiplier():1;
+  const daily=(rate*24+ads*0.01)*mult;
+  const weekly=daily*7;
+  const monthly=daily*30;
+  const daysTo100=daily>0?Math.ceil(100/daily):'∞';
+  const res=document.getElementById('proj-result');
+  res.style.display='block';
+  res.innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.8rem;margin-top:0.5rem;">
+      <div class="stat-box"><div class="stat-num" style="font-size:1.1rem;">$${daily.toFixed(2)}</div><div class="stat-label">PER DAY</div></div>
+      <div class="stat-box"><div class="stat-num" style="font-size:1.1rem;">$${weekly.toFixed(2)}</div><div class="stat-label">PER WEEK</div></div>
+      <div class="stat-box"><div class="stat-num" style="font-size:1.1rem;">$${monthly.toFixed(2)}</div><div class="stat-label">PER MONTH</div></div>
+      <div class="stat-box"><div class="stat-num" style="font-size:1.1rem;">${daysTo100}</div><div class="stat-label">DAYS TO $100</div></div>
+    </div>
+    ${typeof NEXUS_PREMIUM!=='undefined'&&!NEXUS_PREMIUM.isPremium()?'<div style="margin-top:0.5rem;font-size:0.72rem;color:var(--gold);text-align:center;">⭐ Go Premium for up to 5x — that\'s <strong>$'+(daily*5).toFixed(2)+'/day</strong>! <button class="btn btn-gold" style="font-size:0.65rem;padding:5px 10px;margin-left:0.5rem;" onclick="openPremiumModal()">UPGRADE</button></div>':''}
+  `;
+}
+
+/* --- AUTO-MINING LOOP --- */
+setInterval(()=>{
+  EarnEngine.queryMachines().forEach(m=>{
+    const mult=typeof NEXUS_PREMIUM!=='undefined'?NEXUS_PREMIUM.getMiningMultiplier():1;
+    const earned=(30/3600)*m.rate*mult;
+    EarnEngine.setWallet(EarnEngine.getWallet()+earned);
+  });
+  updateUI();
+  renderActiveMiners();
+},30000); // Update every 30 seconds
+
+/* --- INIT --- */
+updateUI();
+initSpinWheel();
+initTasks();
+initReferral();
+
+// Track page visit for task
+localStorage.setItem('task_visited_earn','1');
+</script>
+</body>
+</html>

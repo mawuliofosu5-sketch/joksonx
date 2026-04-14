@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS Tech News</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;}
+.news-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;cursor:pointer;transition:all 0.3s;}
+.news-card:hover{border-color:var(--cyan);box-shadow:var(--glow-cyan);transform:translateY(-4px);}
+.news-tag{display:inline-block;padding:3px 10px;border-radius:4px;font-size:0.65rem;font-family:'Orbitron',monospace;letter-spacing:1px;margin-bottom:0.7rem;}
+.news-title{font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--cyan);margin-bottom:0.5rem;line-height:1.5;}
+.news-excerpt{font-size:0.82rem;opacity:0.7;line-height:1.6;}
+.news-meta{font-size:0.7rem;opacity:0.5;margin-top:0.7rem;font-family:'Share Tech Mono',monospace;}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html">Gaming</a></li><li><a href="science.html">Science</a></li>
+    <li><a href="videos.html">Videos</a></li><li><a href="movies.html">Movies</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li><li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html">Earn 💰</a></li><li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas><div class="cursor"></div><div class="cursor-ring"></div><div class="toast-container"></div>
+<div class="page-header"><h1>📰 TECH NEWS</h1><p>Latest in technology, science, AI, and innovation</p></div>
+<div class="section" style="padding-top:0">
+  <div style="text-align:center;margin-bottom:2rem;" class="reveal">
+    <button class="btn btn-primary" onclick="loadAINews()">⚡ LOAD AI-GENERATED NEWS</button>
+  </div>
+  <div id="ai-news-output" style="display:none;margin-bottom:2rem;" class="ai-answer"></div>
+  <div class="news-grid reveal" id="news-grid">
+    <div class="news-card"><span class="news-tag" style="background:rgba(0,245,255,0.1);color:var(--cyan);">AI</span><div class="news-title">AI SYSTEMS REACH NEW BENCHMARKS IN REASONING TASKS</div><div class="news-excerpt">Latest AI models demonstrate unprecedented performance on complex reasoning and multi-step problem solving, sparking debate about the future of education.</div><div class="news-meta">NEXUS TECH • 2 HOURS AGO</div></div>
+    <div class="news-card"><span class="news-tag" style="background:rgba(255,0,255,0.1);color:var(--magenta);">SPACE</span><div class="news-title">JAMES WEBB TELESCOPE CAPTURES EARLIEST GALAXIES EVER SEEN</div><div class="news-excerpt">NASA's James Webb Space Telescope has imaged galaxies from just 300 million years after the Big Bang, rewriting our understanding of the early universe.</div><div class="news-meta">NEXUS SCIENCE • 5 HOURS AGO</div></div>
+    <div class="news-card"><span class="news-tag" style="background:rgba(57,255,20,0.1);color:var(--neon-green);">TECH</span><div class="news-title">QUANTUM COMPUTERS ACHIEVE BREAKTHROUGH IN ERROR CORRECTION</div><div class="news-excerpt">A team of researchers has demonstrated fault-tolerant quantum computing, a critical milestone on the path to practical quantum computers.</div><div class="news-meta">NEXUS TECH • 8 HOURS AGO</div></div>
+    <div class="news-card"><span class="news-tag" style="background:rgba(255,215,0,0.1);color:var(--gold);">GAMING</span><div class="news-title">NEXT-GEN VR HEADSETS PROMISE FULLY IMMERSIVE EXPERIENCES</div><div class="news-excerpt">New virtual reality hardware with retinal-resolution displays and haptic feedback suits could transform gaming, education, and remote work.</div><div class="news-meta">NEXUS GAMING • 12 HOURS AGO</div></div>
+    <div class="news-card"><span class="news-tag" style="background:rgba(0,245,255,0.1);color:var(--cyan);">BIOLOGY</span><div class="news-title">CRISPR GENE EDITING CURES FIRST HEREDITARY DISEASE IN TRIAL</div><div class="news-excerpt">In a landmark clinical trial, CRISPR gene editing has successfully treated patients with sickle cell disease, marking a new era in medicine.</div><div class="news-meta">NEXUS SCIENCE • 1 DAY AGO</div></div>
+    <div class="news-card"><span class="news-tag" style="background:rgba(255,0,255,0.1);color:var(--magenta);">ENERGY</span><div class="news-title">FUSION ENERGY REACTOR ACHIEVES NET ENERGY GAIN AGAIN</div><div class="news-excerpt">Scientists at the National Ignition Facility confirm a second successful fusion energy experiment, bringing clean unlimited energy closer to reality.</div><div class="news-meta">NEXUS ENERGY • 1 DAY AGO</div></div>
+  </div>
+  <div class="ai-tutor-box reveal" style="margin-top:2rem;">
+    <div class="ai-tutor-title">🤖 ASK ABOUT TECH NEWS</div>
+    <div style="display:flex;gap:0.5rem;">
+      <input id="news-input" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:0.9rem;padding:10px 14px;outline:none;" placeholder="Ask about any tech topic..."/>
+      <button class="btn btn-primary" onclick="askNewsAI()">ASK</button>
+    </div>
+    <div id="news-ai-out" class="ai-output" style="display:none;margin-top:0.8rem;"></div>
+  </div>
+</div>
+<footer><div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+async function loadAINews(){const out=document.getElementById('ai-news-output');out.style.display='block';out.innerHTML='<span class="spinner"></span> Generating latest tech news...';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are a tech journalist. Write 3 brief, engaging tech news headlines with summaries covering AI, space, gaming, or biotech. Use emojis. Make them sound current and exciting.',messages:[{role:'user',content:'Give me the latest tech news headlines with brief summaries'}]})});const data=await res.json();out.textContent=data.content?.[0]?.text||'';}catch(e){out.textContent='Error loading news.';}}
+async function askNewsAI(){const q=document.getElementById('news-input').value.trim();if(!q)return;const out=document.getElementById('news-ai-out');out.style.display='block';out.innerHTML='<span class="spinner"></span>';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are a knowledgeable tech journalist. Answer questions about technology, science, AI, and innovation clearly and engagingly.',messages:[{role:'user',content:q}]})});const data=await res.json();out.textContent=data.content?.[0]?.text||'';}catch(e){out.textContent='Error.';}}
+document.getElementById('news-input').addEventListener('keydown',e=>{if(e.key==='Enter')askNewsAI();});
+</script>
+
+<!-- NEXUS AD SCRIPTS -->
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="https://pl29119943.profitablecpmratenetwork.com/95/36/71/953671a9b1c1310473849544757c959e.js"></script>
+<script src="https://pl29119946.profitablecpmratenetwork.com/4e/c2/c8/4ec2c859136af96e53357bc9a21d1063.js"></script>
+<script async data-cfasync="false" src="https://pl29072711.profitablecpmratenetwork.com/fe2c19526de3ee03ac6f5077ca63cdaa/invoke.js"></script>
+
+<script src="js/premium.js"></script>
+</body>
+</html>

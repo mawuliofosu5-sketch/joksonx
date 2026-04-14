@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS AI Tools</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.tools-nav { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin-bottom:2rem; }
+.tool-nav-btn { font-family:'Orbitron',monospace; font-size:0.7rem; padding:8px 16px; border-radius:6px; border:1px solid var(--border); background:none; color:var(--text); cursor:pointer; transition:all 0.2s; letter-spacing:1px; }
+.tool-nav-btn:hover,.tool-nav-btn.active { border-color:var(--cyan); color:var(--cyan); background:rgba(0,245,255,0.06); box-shadow:var(--glow-cyan); }
+
+.tool-panel { display:none; animation:slide-in 0.3s ease; }
+.tool-panel.active { display:block; }
+
+.ai-output { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.2rem; min-height:80px; margin-top:1rem; line-height:1.7; font-size:0.9rem; white-space:pre-wrap; }
+.ai-output.loading { display:flex; align-items:center; gap:0.5rem; color:var(--cyan); }
+
+.code-editor { width:100%; min-height:200px; background:#010a12; border:1px solid var(--border); border-radius:12px; padding:1rem; color:#00f5ff; font-family:'Share Tech Mono',monospace; font-size:0.85rem; outline:none; resize:vertical; line-height:1.6; }
+.code-editor:focus{border-color:var(--cyan);}
+
+.img-gen-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; margin-top:1rem; }
+.img-placeholder { background:linear-gradient(135deg,rgba(0,245,255,0.06),rgba(255,0,255,0.04)); border:1px solid var(--border); border-radius:12px; height:200px; display:flex; align-items:center; justify-content:center; font-size:3rem; }
+
+.translator-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media(max-width:600px){.translator-grid{grid-template-columns:1fr;}}
+
+.quiz-maker-output .quiz-question { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1rem; margin-bottom:0.8rem; }
+.quiz-maker-output .quiz-question-text { font-weight:700; margin-bottom:0.6rem; }
+.quiz-maker-output .quiz-option { padding:4px 0; font-size:0.85rem; opacity:0.8; }
+.quiz-maker-output .quiz-answer { color:var(--neon-green); font-size:0.8rem; margin-top:0.5rem; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html">Gaming</a></li>
+    <li><a href="science.html">Science</a></li>
+    <li><a href="videos.html">Videos</a></li>
+    <li><a href="movies.html">Movies</a></li>
+    <li><a href="ai-tools.html" class="active">AI Tools</a></li>
+    <li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html">Earn 💰</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas>
+<div class="cursor"></div><div class="cursor-ring"></div>
+<div class="toast-container"></div>
+
+<div class="page-header">
+  <h1>🤖 AI TOOLS</h1>
+  <p>Powerful AI tools for learning, creativity, and productivity</p>
+</div>
+
+<div class="section" style="padding-top:0">
+  <div class="tools-nav reveal">
+    <button class="tool-nav-btn active" onclick="switchTool('writer')">✍️ AI Writer</button>
+    <button class="tool-nav-btn" onclick="switchTool('code')">💻 Code AI</button>
+    <button class="tool-nav-btn" onclick="switchTool('translator')">🌍 Translator</button>
+    <button class="tool-nav-btn" onclick="switchTool('quiz')">🧠 Quiz Maker</button>
+    <button class="tool-nav-btn" onclick="switchTool('summarizer')">📋 Summarizer</button>
+    <button class="tool-nav-btn" onclick="switchTool('math')">🧮 Math Solver</button>
+    <button class="tool-nav-btn" onclick="switchTool('story')">📖 Story Gen</button>
+    <button class="tool-nav-btn" onclick="switchTool('debate')">⚖️ Debate AI</button>
+    <button class="tool-nav-btn" onclick="switchTool('imagine')">🎨 Image Prompt</button>
+    <button class="tool-nav-btn" onclick="switchTool('resume')">📄 CV Maker</button>
+    <button class="tool-nav-btn" onclick="switchTool('lyrics')">🎵 Lyrics AI</button>
+    <button class="tool-nav-btn" onclick="switchTool('roast')">🔥 Roast AI</button>
+    <button class="tool-nav-btn" onclick="switchTool('recipe')">🍳 Recipe AI</button>
+    <button class="tool-nav-btn" onclick="switchTool('fact')">💡 Fact Checker</button>
+    <button class="tool-nav-btn" onclick="switchTool('plan')">📅 Goal Planner</button>
+  </div>
+
+  <!-- WRITER -->
+  <div class="tool-panel active" id="tool-writer">
+    <div class="section-title" style="font-size:1.1rem;text-align:left;margin-bottom:1rem;">✍️ AI WRITER</div>
+    <div class="field"><label>TOPIC / PROMPT</label><input type="text" id="writer-topic" placeholder="e.g. Write an essay about climate change..."/></div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <div class="field" style="flex:1"><label>STYLE</label><select id="writer-style"><option>Academic Essay</option><option>Blog Post</option><option>Story</option><option>Poem</option><option>News Article</option><option>Social Media Post</option><option>Email</option></select></div>
+      <div class="field" style="flex:1"><label>LENGTH</label><select id="writer-length"><option>Short (100 words)</option><option>Medium (300 words)</option><option>Long (500+ words)</option></select></div>
+    </div>
+    <button class="btn btn-primary" onclick="runWriter()">⚡ GENERATE</button>
+    <div class="ai-output" id="writer-output">Your AI-generated content will appear here...</div>
+    <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+      <button class="btn btn-outline" style="font-size:0.7rem;" onclick="copyOutput('writer-output')">📋 COPY</button>
+      <button class="btn btn-outline" style="font-size:0.7rem;" onclick="downloadOutput('writer-output')">💾 DOWNLOAD</button>
+    </div>
+  </div>
+
+  <!-- CODE -->
+  <div class="tool-panel" id="tool-code">
+    <div class="section-title" style="font-size:1.1rem;text-align:left;margin-bottom:1rem;">💻 CODE AI</div>
+    <div class="field"><label>DESCRIBE WHAT YOU WANT TO BUILD</label><input type="text" id="code-prompt" placeholder="e.g. A Python function that sorts a list..."/></div>
+    <div class="field"><label>LANGUAGE</label><select id="code-lang"><option>Python</option><option>JavaScript</option><option>HTML/CSS</option><option>Java</option><option>Kotlin</option><option>C++</option><option>SQL</option></select></div>
+    <button class="btn btn-primary" onclick="runCode()">⚡ GENERATE CODE</button>
+    <div class="ai-output" id="code-output" style="font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:#00f5ff;background:#010a12;">// Your code will appear here...</div>
+    <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+      <button class="btn btn-outline" style="font-size:0.7rem;" onclick="copyOutput('code-output')">📋 COPY CODE</button>
+      <button class="btn btn-outline" style="font-size:0.7rem;" onclick="explainCode()">🤖 EXPLAIN CODE</button>
+    </div>
+    <div class="ai-output" id="code-explain" style="display:none;margin-top:0.5rem;"></div>
+  </div>
+
+  <!-- TRANSLATOR -->
+  <div class="tool-panel" id="tool-translator">
+    <div class="section-title" style="font-size:1.1rem;text-align:left;margin-bottom:1rem;">🌍 AI TRANSLATOR</div>
+    <div class="translator-grid">
+      <div>
+        <div class="field"><label>FROM LANGUAGE</label><select id="trans-from"><option>English</option><option>French</option><option>Spanish</option><option>German</option><option>Chinese</option><option>Arabic</option><option>Swahili</option><option>Hausa</option><option>Yoruba</option><option>Igbo</option><option>Portuguese</option><option>Japanese</option><option>Korean</option></select></div>
+        <div class="field"><label>TEXT TO TRANSLATE</label><textarea id="trans-input" style="min-height:150px;" class="field input" placeholder="Type or paste text here..."></textarea></div>
+      </div>
+      <div>
+        <div class="field"><label>TO LANGUAGE</label><select id="trans-to"><option>French</option><option>English</option><option>Spanish</option><option>German</option><option>Chinese</option><option>Arabic</option><option>Swahili</option><option>Hausa</option><option>Yoruba</option><option>Igbo</option><option>Portuguese</option><option>Japanese</option><option>Korean</option></select></div>
+        <div class="ai-output" id="trans-output" style="min-height:150px;">Translation will appear here...</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="runTranslator()">🌍 TRANSLATE</button>
+  </div>
+
+  <!-- QUIZ MAKER -->
+  <div class="tool-panel" id="tool-quiz">
+    <div class="section-title" style="font-size:1.1rem;text-align:left;margin-bottom:1rem;">🧠 AI QUIZ MAKER</div>
+    <div class="field"><label>TOPIC</label><input type="text" id="quiz-topic" placeholder="e.g. World War 2, Photosynthesis, Python basics..."/></div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <div class="field" style="flex:1"><label>DIFFICULTY</label><select id="quiz-diff"><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
+      <div class="field" style="flex:1"><label>NUMBER OF QUESTIONS</label><select id="quiz-num"><option>5</option><option>10</option><option>15</option></select></div>
+    </div>
+    <button class="btn btn-primary" onclick="runQuizMaker()">⚡ GENERATE QUIZ</button>
+    <div id="quiz-maker-output" style="margin-top:1rem;"></div>
+  </div>
+
+  <!-- SUMMARIZER -->
+  <div class="tool-panel" id="tool-summarizer">
+    <div class="section-title" style="font-size:1.1rem;text-align:left;margin-bottom:1rem;">📋 AI SUMMARIZER</div>
+    <div class="field"><label>PASTE TEXT TO SUMMARIZE</label><textarea id="sum-input" style="min-height:200px;" placeholder="Paste any long text, article, or document here..."></textarea></div>
+    <div class="field"><label>SUMMARY LENGTH</label><select id="sum-length"><option>Brief (2-3 sentences)</option><option>Medium (1 paragraph)</option><option>Detailed (multiple paragraphs)</option></select></div>
+    <button class="btn btn-primary" onclick="runSummarizer()">⚡ SUMMARIZE</button>
+    <div class="ai-output" id="sum-output">Summary will appear here...</div>
+  </div>
+
+  <!-- MATH SOLVER -->
+  <div class="tool-panel" id="tool-math">
+    <div class="section-title" style="font-size:1.1rem;text-align:left;margin-bottom:1rem;">🧮 AI MATH SOLVER</div>
+    <div class="field"><label>ENTER YOUR MATH PROBLEM</label><input type="text" id="math-problem" placeholder="e.g. Solve 2x² + 5x - 3 = 0, or find the area of a circle with radius 7..."/></div>
+    <div class="field"><label>SHOW</label><select id="math-show"><option>Full step-by-step solution</option><option>Just the answer</option><option>Explain the concept</option></select></div>
+    <button class="btn btn-primary" onclick="runMathSolver()">⚡ SOLVE</button>
+    <div class="ai-output" id="math-output">Solution will appear here...</div>
+  </div>
+
+  <!-- STORY GENERATOR -->
+  <div class="tool-panel" id="tool-story">
+    <div class="section-title" style="font-size:1.1rem;text-align:left;margin-bottom:1rem;">📖 AI STORY GENERATOR</div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <div class="field" style="flex:1"><label>GENRE</label><select id="story-genre"><option>Science Fiction</option><option>Fantasy</option><option>Adventure</option><option>Mystery</option><option>Horror</option><option>Romance</option><option>Historical</option></select></div>
+      <div class="field" style="flex:1"><label>MAIN CHARACTER</label><input type="text" id="story-char" placeholder="e.g. A young hacker named Jax..."/></div>
+    </div>
+    <div class="field"><label>SETTING</label><input type="text" id="story-setting" placeholder="e.g. A cyberpunk city in 2085..."/></div>
+    <div class="field"><label>PLOT TWIST (OPTIONAL)</label><input type="text" id="story-twist" placeholder="e.g. The AI becomes sentient..."/></div>
+    <button class="btn btn-primary" onclick="runStoryGen()">⚡ GENERATE STORY</button>
+    <div class="ai-output" id="story-output">Your story will appear here...</div>
+  </div>
+
+  <!-- DEBATE AI -->
+  <div class="tool-panel" id="tool-debate">
+    <div class="section-title" style="font-size:1.1rem;text-align:left;margin-bottom:1rem;">⚖️ DEBATE AI</div>
+    <div class="field"><label>DEBATE TOPIC</label><input type="text" id="debate-topic" placeholder="e.g. Should AI replace teachers? Is social media good for society?"/></div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="runDebate('for')">👍 ARGUE FOR</button>
+      <button class="btn btn-outline" onclick="runDebate('against')">👎 ARGUE AGAINST</button>
+      <button class="btn btn-outline" onclick="runDebate('both')">⚖️ BOTH SIDES</button>
+    </div>
+    <div class="ai-output" id="debate-output">Debate arguments will appear here...</div>
+  </div>
+
+  <!-- IMAGE PROMPT GENERATOR -->
+  <div class="tool-panel" id="tool-imagine">
+    <div class="tool-title">🎨 AI IMAGE PROMPT GENERATOR</div>
+    <p style="font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Describe what you want to create and get a perfect prompt for AI image tools like DALL-E, Midjourney, or Stable Diffusion.</p>
+    <div class="field"><label>WHAT DO YOU WANT TO CREATE?</label><input type="text" id="imagine-input" placeholder="e.g. A futuristic city at night with flying cars and neon lights..."/></div>
+    <div class="field"><label>STYLE</label>
+      <select id="imagine-style" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;">
+        <option value="photorealistic">Photorealistic</option><option value="digital art">Digital Art</option>
+        <option value="anime">Anime</option><option value="oil painting">Oil Painting</option>
+        <option value="watercolor">Watercolor</option><option value="cyberpunk">Cyberpunk</option>
+        <option value="3D render">3D Render</option><option value="pencil sketch">Pencil Sketch</option>
+      </select></div>
+    <button class="btn btn-primary" onclick="runImagine()">⚡ GENERATE PROMPT</button>
+    <div id="imagine-output" class="ai-output" style="display:none;margin-top:1rem;"></div>
+    <div id="imagine-links" style="display:none;margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <a id="dalle-link" href="#" target="_blank" class="btn btn-outline" style="font-size:0.75rem;">🎨 Try on DALL-E</a>
+      <a href="https://www.midjourney.com" target="_blank" class="btn btn-outline" style="font-size:0.75rem;">🖼️ Midjourney</a>
+      <a href="https://stablediffusionweb.com" target="_blank" class="btn btn-outline" style="font-size:0.75rem;">🌀 Stable Diffusion</a>
+    </div>
+  </div>
+
+  <!-- CV / RESUME MAKER -->
+  <div class="tool-panel" id="tool-resume">
+    <div class="tool-title">📄 AI CV / RESUME MAKER</div>
+    <p style="font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Fill in your details and AI will write a professional CV for you.</p>
+    <div class="field"><label>YOUR NAME</label><input type="text" id="cv-name" placeholder="e.g. JoksonX Developer"/></div>
+    <div class="field"><label>JOB TITLE / ROLE YOU WANT</label><input type="text" id="cv-role" placeholder="e.g. Web Developer, Graphic Designer..."/></div>
+    <div class="field"><label>YOUR SKILLS (comma separated)</label><input type="text" id="cv-skills" placeholder="e.g. HTML, CSS, JavaScript, Python..."/></div>
+    <div class="field"><label>EXPERIENCE / PROJECTS</label><textarea id="cv-exp" style="width:100%;min-height:80px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;resize:vertical;" placeholder="Describe your experience or projects..."></textarea></div>
+    <button class="btn btn-primary" onclick="runCV()">⚡ GENERATE CV</button>
+    <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-outline" style="font-size:0.7rem;" onclick="copyOutput('cv-output')">📋 COPY</button>
+      <button class="btn btn-outline" style="font-size:0.7rem;" onclick="downloadOutput('cv-output')">💾 DOWNLOAD</button>
+    </div>
+    <div id="cv-output" class="ai-output" style="display:none;margin-top:1rem;"></div>
+  </div>
+
+  <!-- LYRICS AI -->
+  <div class="tool-panel" id="tool-lyrics">
+    <div class="tool-title">🎵 AI LYRICS GENERATOR</div>
+    <p style="font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Create original song lyrics in any genre and style.</p>
+    <div class="field"><label>SONG THEME / TOPIC</label><input type="text" id="lyrics-topic" placeholder="e.g. A song about being young and chasing dreams..."/></div>
+    <div class="field"><label>GENRE</label>
+      <select id="lyrics-genre" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;">
+        <option>Afrobeats</option><option>Hip-Hop</option><option>Pop</option><option>R&B</option>
+        <option>Gospel</option><option>Highlife</option><option>Dancehall</option><option>Rock</option>
+      </select></div>
+    <div class="field"><label>MOOD</label>
+      <select id="lyrics-mood" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;">
+        <option>Happy & Uplifting</option><option>Sad & Emotional</option><option>Energetic & Hype</option>
+        <option>Romantic</option><option>Motivational</option><option>Party Vibes</option>
+      </select></div>
+    <button class="btn btn-primary" onclick="runLyrics()">⚡ WRITE LYRICS</button>
+    <div style="margin-top:0.5rem;"><button class="btn btn-outline" style="font-size:0.7rem;" onclick="copyOutput('lyrics-output')">📋 COPY</button></div>
+    <div id="lyrics-output" class="ai-output" style="display:none;margin-top:1rem;"></div>
+  </div>
+
+  <!-- ROAST AI -->
+  <div class="tool-panel" id="tool-roast">
+    <div class="tool-title">🔥 FRIENDLY ROAST AI</div>
+    <p style="font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Get a hilarious friendly roast — all fun, no harm! Perfect for joking with friends.</p>
+    <div class="field"><label>YOUR NAME OR YOUR FRIEND'S NAME</label><input type="text" id="roast-name" placeholder="e.g. JoksonX..."/></div>
+    <div class="field"><label>A FEW FACTS (optional)</label><input type="text" id="roast-facts" placeholder="e.g. loves gaming, always late, bad at math..."/></div>
+    <div class="field"><label>ROAST LEVEL</label>
+      <select id="roast-level" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;">
+        <option>Light & Friendly</option><option>Medium Spicy 🌶️</option><option>Extra Crispy 🔥</option>
+      </select></div>
+    <button class="btn btn-gold" onclick="runRoast()">🔥 ROAST ME!</button>
+    <div id="roast-output" class="ai-output" style="display:none;margin-top:1rem;"></div>
+  </div>
+
+  <!-- RECIPE AI -->
+  <div class="tool-panel" id="tool-recipe">
+    <div class="tool-title">🍳 AI RECIPE GENERATOR</div>
+    <p style="font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Tell AI what ingredients you have or what you're craving — it creates a full recipe.</p>
+    <div class="field"><label>INGREDIENTS YOU HAVE (or dish name)</label><input type="text" id="recipe-input" placeholder="e.g. rice, tomatoes, chicken, onion... or 'jollof rice'"/></div>
+    <div class="field"><label>CUISINE STYLE</label>
+      <select id="recipe-cuisine" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;">
+        <option>Ghanaian</option><option>Nigerian</option><option>African</option><option>American</option>
+        <option>Italian</option><option>Asian</option><option>Any / Surprise me!</option>
+      </select></div>
+    <button class="btn btn-primary" onclick="runRecipe()">⚡ GET RECIPE</button>
+    <div id="recipe-output" class="ai-output" style="display:none;margin-top:1rem;"></div>
+  </div>
+
+  <!-- FACT CHECKER -->
+  <div class="tool-panel" id="tool-fact">
+    <div class="tool-title">💡 AI FACT CHECKER</div>
+    <p style="font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Ask AI to verify a claim or statement and give you the facts with explanation.</p>
+    <div class="field"><label>CLAIM OR STATEMENT TO CHECK</label><textarea id="fact-input" style="width:100%;min-height:80px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;resize:vertical;" placeholder="e.g. The Earth is 6,000 years old. / Lightning never strikes twice in the same place."></textarea></div>
+    <button class="btn btn-primary" onclick="runFactCheck()">⚡ CHECK FACTS</button>
+    <div id="fact-output" class="ai-output" style="display:none;margin-top:1rem;"></div>
+  </div>
+
+  <!-- GOAL PLANNER -->
+  <div class="tool-panel" id="tool-plan">
+    <div class="tool-title">📅 AI GOAL PLANNER</div>
+    <p style="font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Set a goal and AI creates a step-by-step action plan to help you achieve it.</p>
+    <div class="field"><label>YOUR GOAL</label><input type="text" id="plan-goal" placeholder="e.g. Learn programming in 3 months, Get fit in 60 days..."/></div>
+    <div class="field"><label>TIMELINE</label>
+      <select id="plan-time" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;">
+        <option>1 Week</option><option>2 Weeks</option><option>1 Month</option><option>3 Months</option>
+        <option>6 Months</option><option>1 Year</option>
+      </select></div>
+    <div class="field"><label>AVAILABLE TIME PER DAY</label>
+      <select id="plan-hours" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px;color:#fff;">
+        <option>30 minutes</option><option>1 hour</option><option>2 hours</option><option>3+ hours</option>
+      </select></div>
+    <button class="btn btn-primary" onclick="runPlanner()">📅 CREATE MY PLAN</button>
+    <div style="margin-top:0.5rem;"><button class="btn btn-outline" style="font-size:0.7rem;" onclick="copyOutput('plan-output')">📋 COPY PLAN</button></div>
+    <div id="plan-output" class="ai-output" style="display:none;margin-top:1rem;"></div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6</div>
+</footer>
+
+
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+function switchTool(name) {
+  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tool-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tool-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+async function aiCall(system, userMsg, outputId) {
+  const out = document.getElementById(outputId);
+  out.innerHTML = '<span class="spinner"></span> AI is working...';
+  out.style.display='block';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system,messages:[{role:'user',content:userMsg}]})
+    });
+    const data = await res.json();
+    out.textContent = data.content?.[0]?.text || 'No response.';
+  } catch(e) { out.textContent='Error. Please try again.'; }
+}
+
+async function runWriter() {
+  const topic = document.getElementById('writer-topic').value.trim();
+  if(!topic){toast('Please enter a topic!','error');return;}
+  const style = document.getElementById('writer-style').value;
+  const length = document.getElementById('writer-length').value;
+  await aiCall(`You are an expert writer. Write ${style.toLowerCase()} content. Target ${length}. Make it compelling, well-structured, and engaging. Use clear language.`, `Write about: ${topic}`, 'writer-output');
+}
+
+async function runCode() {
+  const prompt = document.getElementById('code-prompt').value.trim();
+  if(!prompt){toast('Please describe what to build!','error');return;}
+  const lang = document.getElementById('code-lang').value;
+  await aiCall(`You are an expert ${lang} programmer. Write clean, well-commented, working code. Only output the code and brief comments.`, `Create in ${lang}: ${prompt}`, 'code-output');
+}
+
+async function explainCode() {
+  const code = document.getElementById('code-output').textContent;
+  if(!code||code.includes('Your code')){toast('Generate code first!','error');return;}
+  document.getElementById('code-explain').style.display='block';
+  await aiCall('You are a coding teacher. Explain the given code clearly for a beginner. Break it down line by line if needed.', `Explain this code:\n${code}`, 'code-explain');
+}
+
+async function runTranslator() {
+  const text = document.getElementById('trans-input').value.trim();
+  if(!text){toast('Please enter text!','error');return;}
+  const from = document.getElementById('trans-from').value;
+  const to = document.getElementById('trans-to').value;
+  await aiCall(`You are a professional translator. Translate accurately and naturally. Only output the translated text.`, `Translate from ${from} to ${to}: "${text}"`, 'trans-output');
+}
+
+async function runQuizMaker() {
+  const topic = document.getElementById('quiz-topic').value.trim();
+  if(!topic){toast('Please enter a topic!','error');return;}
+  const diff = document.getElementById('quiz-diff').value;
+  const num = document.getElementById('quiz-num').value;
+  const out = document.getElementById('quiz-maker-output');
+  out.innerHTML='<span class="spinner"></span> Generating quiz...';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        system:'You are a quiz creator. Output ONLY valid JSON array of quiz questions. Format: [{"q":"question","options":["A","B","C","D"],"answer":0,"explanation":"brief explanation"}]. No markdown, no backticks.',
+        messages:[{role:'user',content:`Create ${num} ${diff} multiple choice questions about ${topic}`}]})});
+    const data=await res.json();
+    let text=data.content?.[0]?.text||'[]';
+    text=text.replace(/```json|```/g,'').trim();
+    const questions=JSON.parse(text);
+    out.innerHTML='<div class="quiz-maker-output">' + questions.map((q,i)=>`
+      <div class="quiz-question">
+        <div class="quiz-question-text">${i+1}. ${q.q}</div>
+        ${q.options.map((o,oi)=>`<div class="quiz-option ${oi===q.answer?'quiz-answer':''}">${String.fromCharCode(65+oi)}. ${o}</div>`).join('')}
+        <div class="quiz-answer">✅ Answer: ${String.fromCharCode(65+q.answer)} — ${q.explanation||''}</div>
+      </div>
+    `).join('') + '</div>';
+  } catch(e){out.innerHTML='<p style="color:#ff4444">Error generating quiz. Try a different topic.</p>';}
+}
+
+async function runSummarizer() {
+  const text = document.getElementById('sum-input').value.trim();
+  if(!text){toast('Please paste text!','error');return;}
+  const length = document.getElementById('sum-length').value;
+  await aiCall(`You are a summarizer. Create a ${length.toLowerCase()} of the provided text. Capture key points clearly and concisely.`, `Summarize: ${text}`, 'sum-output');
+}
+
+async function runMathSolver() {
+  const prob = document.getElementById('math-problem').value.trim();
+  if(!prob){toast('Please enter a problem!','error');return;}
+  const show = document.getElementById('math-show').value;
+  await aiCall(`You are a math tutor. Solve problems clearly. ${show}. Use clear notation and formatting.`, `Math problem: ${prob}`, 'math-output');
+}
+
+async function runStoryGen() {
+  const genre = document.getElementById('story-genre').value;
+  const char = document.getElementById('story-char').value||'a mysterious hero';
+  const setting = document.getElementById('story-setting').value||'a cyberpunk city';
+  const twist = document.getElementById('story-twist').value;
+  await aiCall('You are a creative fiction writer. Write engaging, vivid stories with great pacing. Around 400 words.', `Write a ${genre} story. Character: ${char}. Setting: ${setting}. ${twist?'Twist: '+twist:''}`, 'story-output');
+}
+
+async function runDebate(side) {
+  const topic = document.getElementById('debate-topic').value.trim();
+  if(!topic){toast('Please enter a topic!','error');return;}
+  const sideMap = {for:'strong arguments FOR',against:'strong arguments AGAINST',both:'balanced arguments FOR and AGAINST'};
+  await aiCall('You are a debate champion. Present compelling, logical arguments. Use evidence and examples. Be persuasive but fair.', `Present ${sideMap[side]}: "${topic}"`, 'debate-output');
+}
+
+function copyOutput(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard!','success'));
+}
+
+function downloadOutput(id) {
+  const text = document.getElementById(id).textContent;
+  const a = document.createElement('a');
+  a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(text);
+  a.download='nexus-ai-output.txt';
+  a.click();
+  toast('Downloaded!','success');
+}
+
+async function runImagine(){
+  const desc=document.getElementById('imagine-input').value.trim(),style=document.getElementById('imagine-style').value;
+  if(!desc){toast('Describe what you want!','error');return;}
+  const out=document.getElementById('imagine-output');out.style.display='block';out.innerHTML='⚡ Crafting perfect AI image prompt...';
+  try{const r=await aiCall('You are an expert AI art prompt engineer. Create a detailed, highly effective image generation prompt. Include style, lighting, colors, composition, and technical details. Return ONLY the prompt text, no explanation.',`Create an image prompt for: ${desc} in ${style} style`,null);out.innerHTML=r;
+  document.getElementById('dalle-link').href='https://labs.openai.com/?prompt='+encodeURIComponent(r.substring(0,200));
+  document.getElementById('imagine-links').style.display='flex';}catch(e){out.innerHTML='⚠️ Error generating prompt.';}
+}
+
+async function runCV(){
+  const name=document.getElementById('cv-name').value,role=document.getElementById('cv-role').value,skills=document.getElementById('cv-skills').value,exp=document.getElementById('cv-exp').value;
+  if(!name||!role){toast('Fill in your name and role!','error');return;}
+  const out=document.getElementById('cv-output');out.style.display='block';out.innerHTML='📄 Writing your professional CV...';
+  try{const r=await aiCall('You are a professional CV writer. Create a clean, well-structured CV. Use clear sections: Summary, Skills, Experience/Projects, Education. Make it professional and compelling.',`Name: ${name}\nRole: ${role}\nSkills: ${skills}\nExperience: ${exp}`,null);out.innerHTML=r.replace(/\n/g,'<br>');}catch(e){out.innerHTML='⚠️ Error.';}
+}
+
+async function runLyrics(){
+  const topic=document.getElementById('lyrics-topic').value,genre=document.getElementById('lyrics-genre').value,mood=document.getElementById('lyrics-mood').value;
+  if(!topic){toast('Enter a song topic!','error');return;}
+  const out=document.getElementById('lyrics-output');out.style.display='block';out.innerHTML='🎵 Writing your lyrics...';
+  try{const r=await aiCall(`You are a talented ${genre} songwriter. Write complete song lyrics with verses, chorus, and bridge. Match the mood: ${mood}. Be creative and authentic.`,`Write a ${genre} song about: ${topic}`,null);out.innerHTML=r.replace(/\n/g,'<br>');}catch(e){out.innerHTML='⚠️ Error.';}
+}
+
+async function runRoast(){
+  const name=document.getElementById('roast-name').value,facts=document.getElementById('roast-facts').value,level=document.getElementById('roast-level').value;
+  if(!name){toast('Enter a name!','error');return;}
+  const out=document.getElementById('roast-output');out.style.display='block';out.innerHTML='🔥 Firing up the roast machine...';
+  try{const r=await aiCall(`You are a hilarious friendly roast comedian. Keep it fun and not mean-spirited. Level: ${level}. Use humor, wordplay, and emojis.`,`Roast ${name}. Facts: ${facts||'none provided'}`,null);out.innerHTML=r.replace(/\n/g,'<br>');}catch(e){out.innerHTML='⚠️ Error.';}
+}
+
+async function runRecipe(){
+  const ingredients=document.getElementById('recipe-input').value,cuisine=document.getElementById('recipe-cuisine').value;
+  if(!ingredients){toast('Enter ingredients or dish name!','error');return;}
+  const out=document.getElementById('recipe-output');out.style.display='block';out.innerHTML='🍳 Creating your recipe...';
+  try{const r=await aiCall(`You are a master ${cuisine} chef. Provide a detailed recipe with: Ingredients list, step-by-step instructions, cooking time, servings, and tips. Use emojis.`,`Create a ${cuisine} recipe using: ${ingredients}`,null);out.innerHTML=r.replace(/\n/g,'<br>');}catch(e){out.innerHTML='⚠️ Error.';}
+}
+
+async function runFactCheck(){
+  const claim=document.getElementById('fact-input').value;
+  if(!claim){toast('Enter a claim to check!','error');return;}
+  const out=document.getElementById('fact-output');out.style.display='block';out.innerHTML='💡 Checking the facts...';
+  try{const r=await aiCall('You are a fact-checking AI. Analyze the claim. State: TRUE/FALSE/PARTIALLY TRUE, then explain with evidence. Use emojis. Be clear and educational.',`Fact check: ${claim}`,null);out.innerHTML=r.replace(/\n/g,'<br>');}catch(e){out.innerHTML='⚠️ Error.';}
+}
+
+async function runPlanner(){
+  const goal=document.getElementById('plan-goal').value,time=document.getElementById('plan-time').value,hours=document.getElementById('plan-hours').value;
+  if(!goal){toast('Enter your goal!','error');return;}
+  const out=document.getElementById('plan-output');out.style.display='block';out.innerHTML='📅 Building your personalized plan...';
+  try{const r=await aiCall('You are a life coach and productivity expert. Create a detailed, actionable step-by-step goal achievement plan. Include weekly milestones, daily tasks, and motivational tips. Use clear structure and emojis.',`Goal: ${goal}\nTimeline: ${time}\nTime available per day: ${hours}`,null);out.innerHTML=r.replace(/\n/g,'<br>');}catch(e){out.innerHTML='⚠️ Error.';}
+}
+</script>
+
+<!-- NEXUS AD SCRIPTS -->
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="https://pl29119943.profitablecpmratenetwork.com/95/36/71/953671a9b1c1310473849544757c959e.js"></script>
+<script src="https://pl29119946.profitablecpmratenetwork.com/4e/c2/c8/4ec2c859136af96e53357bc9a21d1063.js"></script>
+<script async data-cfasync="false" src="https://pl29072711.profitablecpmratenetwork.com/fe2c19526de3ee03ac6f5077ca63cdaa/invoke.js"></script>
+
+<script src="js/premium.js"></script>
+</body>
+</html>

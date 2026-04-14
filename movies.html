@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS Movies</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.movie-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1.5rem;}
+.movie-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.3s;position:relative;}
+.movie-card:hover{transform:translateY(-6px);border-color:var(--magenta);box-shadow:var(--glow-mag);}
+.movie-poster{width:100%;height:260px;object-fit:cover;background:linear-gradient(135deg,rgba(0,245,255,0.1),rgba(255,0,255,0.08));display:flex;align-items:center;justify-content:center;font-size:5rem;}
+.movie-info{padding:0.8rem;}
+.movie-title{font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--cyan);margin-bottom:0.2rem;}
+.movie-year{font-size:0.7rem;color:var(--magenta);}
+.movie-rating{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.8);border:1px solid var(--gold);border-radius:6px;padding:2px 8px;font-size:0.7rem;color:var(--gold);font-family:'Orbitron',monospace;}
+.genre-tabs{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:2rem;}
+.genre-tab{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text);cursor:pointer;font-size:0.75rem;font-family:'Orbitron',monospace;transition:all 0.2s;}
+.genre-tab:hover,.genre-tab.active{border-color:var(--magenta);color:var(--magenta);background:rgba(255,0,255,0.06);}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html">Gaming</a></li><li><a href="science.html">Science</a></li>
+    <li><a href="videos.html">Videos</a></li><li><a href="movies.html" class="active">Movies</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li><li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html">Earn 💰</a></li><li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas><div class="cursor"></div><div class="cursor-ring"></div><div class="toast-container"></div>
+<div class="page-header"><h1>🎬 MOVIE UNIVERSE</h1><p>Browse, discover, and get AI recommendations for your next watch</p></div>
+<div class="section" style="padding-top:0">
+  <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;" class="reveal">
+    <input id="movie-search-inp" class="search-input" style="flex:1;max-width:400px;" placeholder="Search movies..."/>
+    <button class="btn btn-primary" onclick="searchMovies()">🔍 SEARCH</button>
+  </div>
+  <div class="genre-tabs reveal">
+    <button class="genre-tab active" onclick="filterMovies('all',this)">ALL</button>
+    <button class="genre-tab" onclick="filterMovies('scifi',this)">SCI-FI</button>
+    <button class="genre-tab" onclick="filterMovies('action',this)">ACTION</button>
+    <button class="genre-tab" onclick="filterMovies('animation',this)">ANIMATION</button>
+    <button class="genre-tab" onclick="filterMovies('adventure',this)">ADVENTURE</button>
+    <button class="genre-tab" onclick="filterMovies('comedy',this)">COMEDY</button>
+    <button class="genre-tab" onclick="filterMovies('drama',this)">DRAMA</button>
+    <button class="genre-tab" onclick="filterMovies('superhero',this)">SUPERHERO</button>
+  </div>
+  <div style="background:linear-gradient(135deg,rgba(0,245,255,0.06),rgba(255,0,255,0.04));border:1px solid var(--border);border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1.5rem;display:flex;flex-wrap:wrap;align-items:center;gap:1rem;" class="reveal">
+    <div style="flex:1;min-width:180px;">
+      <div style="font-family:'Orbitron',monospace;font-size:0.82rem;color:var(--cyan);margin-bottom:0.3rem;">🌍 BROWSE ALL MOVIES WORLDWIDE</div>
+      <div style="font-size:0.75rem;opacity:0.55;">Search every streaming platform and find any movie in the world</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:0.6rem;">
+      <a href="https://www.justwatch.com" target="_blank" class="btn btn-outline" style="font-size:0.72rem;color:var(--magenta);border-color:var(--magenta);">📡 JustWatch</a>
+      <a href="https://www.imdb.com" target="_blank" class="btn btn-outline" style="font-size:0.72rem;color:var(--gold);border-color:var(--gold);">⭐ IMDb</a>
+      <a href="https://fmoviesz.to" target="_blank" class="btn btn-outline" style="font-size:0.72rem;color:var(--cyan);border-color:var(--cyan);">🎬 FMovies</a>
+      <a href="https://www.netflix.com/browse" target="_blank" class="btn" style="font-size:0.72rem;background:#e50914;color:#fff;border:none;">▶ Netflix</a>
+      <a href="https://www.primevideo.com" target="_blank" class="btn" style="font-size:0.72rem;background:#00a8e0;color:#fff;border:none;">▶ Prime</a>
+    </div>
+  </div>
+  <div class="movie-grid reveal" id="movie-grid">
+    <div class="movie-card" data-cat="scifi" onclick="showMovieInfo('Interstellar','2014','⭐ 8.7','Sci-Fi/Drama','A team of astronauts travel through a wormhole in search of a new home for humanity.')"><div class="movie-poster">🚀</div><div class="movie-rating">⭐ 8.7</div><div class="movie-info"><div class="movie-title">INTERSTELLAR</div><div class="movie-year">2014 • Sci-Fi</div></div></div>
+    <div class="movie-card" data-cat="scifi" onclick="showMovieInfo('Inception','2010','⭐ 8.8','Sci-Fi/Thriller','A thief enters people\'s dreams to steal secrets, but is given a chance to plant an idea instead.')"><div class="movie-poster">🌀</div><div class="movie-rating">⭐ 8.8</div><div class="movie-info"><div class="movie-title">INCEPTION</div><div class="movie-year">2010 • Sci-Fi</div></div></div>
+    <div class="movie-card" data-cat="action" onclick="showMovieInfo('The Matrix','1999','⭐ 8.7','Action/Sci-Fi','A hacker discovers that reality is a simulation and joins a rebellion against the machines.')"><div class="movie-poster">🟢</div><div class="movie-rating">⭐ 8.7</div><div class="movie-info"><div class="movie-title">THE MATRIX</div><div class="movie-year">1999 • Action</div></div></div>
+    <div class="movie-card" data-cat="animation" onclick="showMovieInfo('Spider-Man: Into the Spider-Verse','2018','⭐ 8.4','Animation/Action','A young Miles Morales becomes Spider-Man and meets other Spider-People from parallel dimensions.')"><div class="movie-poster">🕷️</div><div class="movie-rating">⭐ 8.4</div><div class="movie-info"><div class="movie-title">SPIDER-VERSE</div><div class="movie-year">2018 • Animation</div></div></div>
+    <div class="movie-card" data-cat="adventure" onclick="showMovieInfo('Avatar','2009','⭐ 7.9','Adventure/Sci-Fi','A paraplegic Marine is sent to the moon Pandora to help extract valuable minerals.')"><div class="movie-poster">🔵</div><div class="movie-rating">⭐ 7.9</div><div class="movie-info"><div class="movie-title">AVATAR</div><div class="movie-year">2009 • Adventure</div></div></div>
+    <div class="movie-card" data-cat="animation" onclick="showMovieInfo('Soul','2020','⭐ 8.1','Animation/Drama','A musician is transported to the Great Before and must find his way back to Earth.')"><div class="movie-poster">🎷</div><div class="movie-rating">⭐ 8.1</div><div class="movie-info"><div class="movie-title">SOUL</div><div class="movie-year">2020 • Animation</div></div></div>
+    <div class="movie-card" data-cat="scifi" onclick="showMovieInfo('Dune','2021','⭐ 8.0','Sci-Fi/Epic','A noble\'s son leads desert warriors to free his world from an evil emperor\'s grip.')"><div class="movie-poster">🏜️</div><div class="movie-rating">⭐ 8.0</div><div class="movie-info"><div class="movie-title">DUNE</div><div class="movie-year">2021 • Sci-Fi</div></div></div>
+    <div class="movie-card" data-cat="action" onclick="showMovieInfo('Top Gun: Maverick','2022','⭐ 8.3','Action/Drama','After thirty years, Maverick is still pushing the envelope as a top naval aviator.')"><div class="movie-poster">✈️</div><div class="movie-rating">⭐ 8.3</div><div class="movie-info"><div class="movie-title">TOP GUN: MAVERICK</div><div class="movie-year">2022 • Action</div></div></div>
+    <div class="movie-card" data-cat="comedy" onclick="showMovieInfo('The Lego Movie','2014','⭐ 7.7','Animation/Comedy','An ordinary LEGO construction worker is told he is the special one who can save the world.')"><div class="movie-poster">🧱</div><div class="movie-rating">⭐ 7.7</div><div class="movie-info"><div class="movie-title">THE LEGO MOVIE</div><div class="movie-year">2014 • Comedy</div></div></div>
+    <div class="movie-card" data-cat="adventure" onclick="showMovieInfo('Jurassic World','2015','⭐ 7.0','Adventure/Action','A new theme park with genetically modified dinosaurs runs into catastrophic trouble.')"><div class="movie-poster">🦖</div><div class="movie-rating">⭐ 7.0</div><div class="movie-info"><div class="movie-title">JURASSIC WORLD</div><div class="movie-year">2015 • Adventure</div></div></div>
+    <div class="movie-card" data-cat="animation" onclick="showMovieInfo('Encanto','2021','⭐ 7.2','Animation/Musical','A Colombian family is blessed with magical powers — except for one young girl.')"><div class="movie-poster">🌺</div><div class="movie-rating">⭐ 7.2</div><div class="movie-info"><div class="movie-title">ENCANTO</div><div class="movie-year">2021 • Animation</div></div></div>
+    <div class="movie-card" data-cat="scifi" onclick="showMovieInfo('Tenet','2020','⭐ 7.3','Sci-Fi/Action','A secret agent travels through time to prevent World War III.')"><div class="movie-poster">⏪</div><div class="movie-rating">⭐ 7.3</div><div class="movie-info"><div class="movie-title">TENET</div><div class="movie-year">2020 • Sci-Fi</div></div></div>
+
+    <div class="movie-card" data-cat="action" onclick="showMovieInfo('Black Panther','2018','⭐ 7.3','Action/Superhero','T\'Challa returns to Wakanda as king but faces a challenger who has bold plans for the nation.')"><div class="movie-poster">🐾</div><div class="movie-rating">⭐ 7.3</div><div class="movie-info"><div class="movie-title">BLACK PANTHER</div><div class="movie-year">2018 • Action</div></div></div>
+    <div class="movie-card" data-cat="scifi" onclick="showMovieInfo('Avengers: Endgame','2019','⭐ 8.4','Sci-Fi/Action','The Avengers travel back in time to reverse Thanos\'s snap and restore the universe.')"><div class="movie-poster">⚡</div><div class="movie-rating">⭐ 8.4</div><div class="movie-info"><div class="movie-title">AVENGERS: ENDGAME</div><div class="movie-year">2019 • Action</div></div></div>
+    <div class="movie-card" data-cat="animation" onclick="showMovieInfo('Moana','2016','⭐ 7.6','Animation/Adventure','A Polynesian chief\'s daughter sails across the ocean to save her island with help from a demigod.')"><div class="movie-poster">🌊</div><div class="movie-rating">⭐ 7.6</div><div class="movie-info"><div class="movie-title">MOANA</div><div class="movie-year">2016 • Animation</div></div></div>
+    <div class="movie-card" data-cat="comedy" onclick="showMovieInfo('Minions','2015','⭐ 6.4','Comedy/Animation','The Minions seek out the most despicable master they can find, leading to chaos everywhere.')"><div class="movie-poster">💛</div><div class="movie-rating">⭐ 6.4</div><div class="movie-info"><div class="movie-title">MINIONS</div><div class="movie-year">2015 • Comedy</div></div></div>
+    <div class="movie-card" data-cat="adventure" onclick="showMovieInfo('Coco','2017','⭐ 8.4','Animation/Adventure','A boy in Mexico secretly pursues his dream of becoming a musician despite family disapproval.')"><div class="movie-poster">💀</div><div class="movie-rating">⭐ 8.4</div><div class="movie-info"><div class="movie-title">COCO</div><div class="movie-year">2017 • Adventure</div></div></div>
+    <div class="movie-card" data-cat="scifi" onclick="showMovieInfo('Oppenheimer','2023','⭐ 8.3','Drama/History','The story of the American scientist J. Robert Oppenheimer and his development of the atomic bomb.')"><div class="movie-poster">☢️</div><div class="movie-rating">⭐ 8.3</div><div class="movie-info"><div class="movie-title">OPPENHEIMER</div><div class="movie-year">2023 • Drama</div></div></div>
+    <div class="movie-card" data-cat="action" onclick="showMovieInfo('Guardians of the Galaxy','2014','⭐ 8.0','Action/Comedy','A group of intergalactic criminals must pull together to stop a fanatical warrior.')"><div class="movie-poster">🌌</div><div class="movie-rating">⭐ 8.0</div><div class="movie-info"><div class="movie-title">GUARDIANS OF GALAXY</div><div class="movie-year">2014 • Action</div></div></div>
+    <div class="movie-card" data-cat="animation" onclick="showMovieInfo('The Lion King','2019','⭐ 6.9','Animation/Adventure','A young lion prince flees his kingdom after his father is murdered by his uncle.')"><div class="movie-poster">🦁</div><div class="movie-rating">⭐ 6.9</div><div class="movie-info"><div class="movie-title">THE LION KING</div><div class="movie-year">2019 • Animation</div></div></div>
+  </div>
+  <!-- AI RECOMMENDER -->
+  <div class="ai-tutor-box reveal" style="margin-top:2rem;">
+    <div class="ai-tutor-title">🤖 AI MOVIE RECOMMENDER</div>
+    <p style="font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Tell me your mood or favorite genre and I'll recommend the perfect movie!</p>
+    <div style="display:flex;gap:0.5rem;">
+      <input id="movie-ai-input" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:0.9rem;padding:10px 14px;outline:none;" placeholder="e.g. I want a sci-fi movie with time travel..."/>
+      <button class="btn btn-primary" onclick="getMovieRec()">RECOMMEND</button>
+    </div>
+    <div id="movie-ai-output" class="ai-output" style="display:none;margin-top:0.8rem;"></div>
+  </div>
+</div>
+<!-- MOVIE DETAIL MODAL -->
+<div class="modal-overlay" id="movie-modal">
+  <div class="modal-box" style="position:relative;">
+    <button class="modal-close" onclick="document.getElementById('movie-modal').classList.remove('open')">✕</button>
+    <div class="modal-title" id="mm-title"></div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <span id="mm-rating" class="tag tag-cyan"></span>
+      <span id="mm-genre" class="tag tag-mag"></span>
+    </div>
+    <p id="mm-desc" style="opacity:0.8;line-height:1.7;margin-bottom:1rem;"></p>
+    <div id="mm-ai" class="ai-output" style="display:none;"></div>
+    <div style="display:flex;gap:0.8rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <button class="btn btn-primary" onclick="loadMovieAI()">🤖 Get AI Review</button>
+      <a id="mm-netflix" href="#" target="_blank" class="btn" style="background:linear-gradient(135deg,#e50914,#b20610);color:#fff;text-decoration:none;">▶ Netflix</a>
+      <a id="mm-prime" href="#" target="_blank" class="btn" style="background:linear-gradient(135deg,#00a8e0,#0066c0);color:#fff;text-decoration:none;">▶ Prime Video</a>
+      <a id="mm-imdb" href="#" target="_blank" class="btn btn-outline" style="color:var(--gold);border-color:var(--gold);">📊 IMDb</a>
+      <a id="mm-youtube" href="#" target="_blank" class="btn btn-outline">▶ YouTube</a>
+      <a id="mm-fmovies" href="#" target="_blank" class="btn btn-outline" style="color:var(--cyan);border-color:var(--cyan);">🎬 Watch Free</a>
+      <a id="mm-justwatch" href="#" target="_blank" class="btn btn-outline" style="color:var(--magenta);border-color:var(--magenta);">📡 JustWatch</a>
+    </div>
+  </div>
+</div>
+<footer><div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+let currentMovie='';
+function filterMovies(cat,btn){document.querySelectorAll('.genre-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.movie-card').forEach(c=>{c.style.display=(cat==='all'||c.dataset.cat===cat)?'':' none';});}
+function showMovieInfo(title,year,rating,genre,desc){
+  currentMovie=title;
+  document.getElementById('mm-title').textContent=title+' ('+year+')';
+  document.getElementById('mm-rating').textContent=rating;
+  document.getElementById('mm-genre').textContent=genre;
+  document.getElementById('mm-desc').textContent=desc;
+  document.getElementById('mm-ai').style.display='none';
+  const q=encodeURIComponent(title);
+  const qy=encodeURIComponent(title+' '+year);
+  document.getElementById('mm-netflix').href='https://www.netflix.com/search?q='+q;
+  document.getElementById('mm-prime').href='https://www.amazon.com/s?k='+q+'&i=instant-video';
+  document.getElementById('mm-imdb').href='https://www.imdb.com/find?q='+qy;
+  document.getElementById('mm-youtube').href='https://www.youtube.com/results?search_query='+q+'+full+movie+free';
+  document.getElementById('mm-fmovies').href='https://fmoviesz.to/search/'+q;
+  document.getElementById('mm-justwatch').href='https://www.justwatch.com/us/search?q='+q;
+  document.getElementById('movie-modal').classList.add('open');
+}
+async function loadMovieAI(){const out=document.getElementById('mm-ai');out.style.display='block';out.innerHTML='<span class="spinner"></span> Loading AI review...';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are a film critic. Give an engaging review with themes, who it\'s good for, and a verdict. Use emojis.',messages:[{role:'user',content:`Review the movie: ${currentMovie}`}]})});const data=await res.json();out.textContent=data.content?.[0]?.text||'No review.';}catch(e){out.textContent='Error.';}}
+async function getMovieRec(){const q=document.getElementById('movie-ai-input').value.trim();if(!q){toast('Tell me your mood!','error');return;}const out=document.getElementById('movie-ai-output');out.style.display='block';out.innerHTML='<span class="spinner"></span> Finding perfect movies...';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are a movie expert. Recommend 3-5 movies based on the user\'s request. Include title, year, rating, and why they\'ll love it. Use emojis.',messages:[{role:'user',content:q}]})});const data=await res.json();out.textContent=data.content?.[0]?.text||'No recommendations.';}catch(e){out.textContent='Error.';}}
+async function searchMovies(){const q=document.getElementById('movie-search-inp').value.trim();if(!q)return;toast('Searching: '+q);document.querySelectorAll('.movie-card').forEach(c=>{const t=c.querySelector('.movie-title')?.textContent||'';c.style.display=t.toLowerCase().includes(q.toLowerCase())?'':'none';});}
+</script>
+
+<!-- NEXUS AD SCRIPTS -->
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="https://pl29119943.profitablecpmratenetwork.com/95/36/71/953671a9b1c1310473849544757c959e.js"></script>
+<script src="https://pl29119946.profitablecpmratenetwork.com/4e/c2/c8/4ec2c859136af96e53357bc9a21d1063.js"></script>
+<script async data-cfasync="false" src="https://pl29072711.profitablecpmratenetwork.com/fe2c19526de3ee03ac6f5077ca63cdaa/invoke.js"></script>
+
+<script src="js/premium.js"></script>
+</body>
+</html>

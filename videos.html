@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS Videos</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;}
+.video-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.3s;}
+.video-card:hover{transform:translateY(-5px);border-color:var(--cyan);box-shadow:var(--glow-cyan);}
+.video-thumb{position:relative;width:100%;padding-top:56.25%;background:#010a12;}
+.video-thumb iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.video-info{padding:1rem;}
+.video-title{font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--cyan);margin-bottom:0.3rem;}
+.video-channel{font-size:0.75rem;color:var(--magenta);}
+.video-desc{font-size:0.78rem;opacity:0.7;margin-top:0.4rem;line-height:1.5;}
+.cat-tabs{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:2rem;}
+.cat-tab{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text);cursor:pointer;font-size:0.78rem;font-family:'Orbitron',monospace;transition:all 0.2s;}
+.cat-tab:hover,.cat-tab.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,245,255,0.07);}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html">Gaming</a></li><li><a href="science.html">Science</a></li>
+    <li><a href="videos.html" class="active">Videos</a></li><li><a href="movies.html">Movies</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li><li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html">Earn 💰</a></li><li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas><div class="cursor"></div><div class="cursor-ring"></div><div class="toast-container"></div>
+<div class="page-header"><h1>▶️ VIDEO HUB</h1><p>Educational, science, tech, gaming & more videos</p></div>
+<div class="section" style="padding-top:0">
+  <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;" class="reveal">
+    <input id="yt-search-inp" class="search-input" style="flex:1;max-width:420px;" placeholder="🔍 Search YouTube videos..." onkeydown="if(event.key==='Enter')searchYouTube()"/>
+    <button class="btn btn-primary" onclick="searchYouTube()">SEARCH YOUTUBE</button>
+    <button class="btn btn-outline" onclick="openYouTube()">▶️ Open YouTube</button>
+  </div>
+  <div id="yt-result" style="display:none;margin-bottom:1.5rem;"></div>
+  <div class="cat-tabs reveal">
+    <button class="cat-tab active" onclick="filterVideos('all',this)">ALL</button>
+    <button class="cat-tab" onclick="filterVideos('science',this)">SCIENCE</button>
+    <button class="cat-tab" onclick="filterVideos('tech',this)">TECH</button>
+    <button class="cat-tab" onclick="filterVideos('math',this)">MATH</button>
+    <button class="cat-tab" onclick="filterVideos('gaming',this)">GAMING</button>
+    <button class="cat-tab" onclick="filterVideos('diy',this)">DIY</button>
+    <button class="cat-tab" onclick="filterVideos('history',this)">HISTORY</button>
+    <button class="cat-tab" onclick="filterVideos('space',this)">SPACE</button>
+    <button class="cat-tab" onclick="filterVideos('coding',this)">CODING</button>
+    <button class="cat-tab" onclick="filterVideos('motivation',this)">MOTIVATION</button>
+  </div>
+  <div class="video-grid reveal" id="video-grid">
+    <div class="video-card" data-cat="science"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/0NbBjNiw4tk" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">HOW BLACK HOLES WORK</div><div class="video-channel">Kurzgesagt</div><div class="video-desc">Explore the physics behind the universe's most mysterious objects.</div></div></div>
+    <div class="video-card" data-cat="tech"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/aircAruvnKk" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">NEURAL NETWORKS EXPLAINED</div><div class="video-channel">3Blue1Brown</div><div class="video-desc">Visual explanation of how AI neural networks actually work.</div></div></div>
+    <div class="video-card" data-cat="math"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/WUvTyaaNkzM" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">THE ESSENCE OF CALCULUS</div><div class="video-channel">3Blue1Brown</div><div class="video-desc">A beautiful visual introduction to calculus concepts.</div></div></div>
+    <div class="video-card" data-cat="science"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/7BMLOR4uS0Q" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">QUANTUM PHYSICS EXPLAINED</div><div class="video-channel">Kurzgesagt</div><div class="video-desc">The mind-bending world of quantum mechanics made simple.</div></div></div>
+    <div class="video-card" data-cat="tech"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/qYNweeDHiyU" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">HOW COMPUTERS WORK</div><div class="video-channel">Code.org</div><div class="video-desc">Inside the machine — from transistors to programs.</div></div></div>
+    <div class="video-card" data-cat="diy"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/vcXDHPvTed8" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">BUILD YOUR FIRST CIRCUIT</div><div class="video-channel">Practical Engineering</div><div class="video-desc">Learn basic electronics and build a working LED circuit.</div></div></div>
+    <div class="video-card" data-cat="gaming"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/XH6jDiKxod8" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">HOW GAME ENGINES WORK</div><div class="video-channel">Sebastian Lague</div><div class="video-desc">The math and code behind modern game development.</div></div></div>
+    <div class="video-card" data-cat="science"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/Pj-h6MEgE7I" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">THE DNA STORY</div><div class="video-channel">TED-Ed</div><div class="video-desc">How DNA was discovered and what makes it so amazing.</div></div></div>
+
+    <div class="video-card" data-cat="space"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/0FH9cgRhQ-k" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">MARS EXPLORATION</div><div class="video-channel">NASA</div><div class="video-desc">The story of exploring the red planet with rovers and probes.</div></div></div>
+    <div class="video-card" data-cat="coding"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/zOjov-2OZ0E" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">LEARN PYTHON IN 1 HOUR</div><div class="video-channel">Programming with Mosh</div><div class="video-desc">Full beginner Python tutorial — from scratch to real programs.</div></div></div>
+    <div class="video-card" data-cat="coding"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/PkZNo7MFNFg" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">LEARN JAVASCRIPT</div><div class="video-channel">freeCodeCamp</div><div class="video-desc">Complete JavaScript tutorial for beginners — build real projects.</div></div></div>
+    <div class="video-card" data-cat="history"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/xuCn8ux2gbs" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">HISTORY OF THE WORLD</div><div class="video-channel">UsefulCharts</div><div class="video-desc">A visual timeline of world history from ancient times to today.</div></div></div>
+    <div class="video-card" data-cat="science"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/e-P5IFTqB98" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">THE UNIVERSE IS HUGE</div><div class="video-channel">Kurzgesagt</div><div class="video-desc">Just how vast is the observable universe? The answer is mind-blowing.</div></div></div>
+    <div class="video-card" data-cat="tech"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/nKW8Ndu7Mjw" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">HOW AI ART WORKS</div><div class="video-channel">Computerphile</div><div class="video-desc">The technology behind AI-generated images explained simply.</div></div></div>
+    <div class="video-card" data-cat="motivation"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/ZXsQAXx_ao0" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">HOW TO LEARN FASTER</div><div class="video-channel">Thomas Frank</div><div class="video-desc">Science-backed strategies to learn anything faster and retain it longer.</div></div></div>
+    <div class="video-card" data-cat="motivation"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/pqFR48wRKQo" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">STOP WASTING TIME</div><div class="video-channel">Matt D'Avella</div><div class="video-desc">How to build habits that actually stick and stop procrastinating.</div></div></div>
+    <div class="video-card" data-cat="diy"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/1ehpgbb3XD0" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">BUILD A ROBOT ARM</div><div class="video-channel">Maker's Muse</div><div class="video-desc">Step-by-step guide to building a robotic arm from scratch.</div></div></div>
+    <div class="video-card" data-cat="space"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/cTiVTLUsBeg" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">HOW ROCKETS WORK</div><div class="video-channel">Scott Manley</div><div class="video-desc">Orbital mechanics and rocket science explained engagingly.</div></div></div>
+    <div class="video-card" data-cat="math"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/spUNpyF58BY" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">FOURIER TRANSFORM</div><div class="video-channel">3Blue1Brown</div><div class="video-desc">One of the most beautiful ideas in all of mathematics visualized.</div></div></div>
+    <div class="video-card" data-cat="gaming"><div class="video-thumb"><iframe src="https://www.youtube.com/embed/v68zYyaEmEA" allowfullscreen loading="lazy"></iframe></div><div class="video-info"><div class="video-title">HOW TO MAKE A GAME</div><div class="video-channel">Brackeys</div><div class="video-desc">Complete beginner game development tutorial using Unity.</div></div></div>
+  </div>
+  <!-- AI VIDEO RECOMMENDER -->
+  <div class="ai-tutor-box reveal" style="margin-top:2rem;">
+    <div class="ai-tutor-title">🤖 AI VIDEO RECOMMENDER</div>
+    <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+      <input id="vid-recommend-input" class="tutor-input" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:0.9rem;padding:10px 14px;outline:none;" placeholder="What topic are you interested in?"/>
+      <button class="btn btn-primary" onclick="recommendVideo()">FIND</button>
+    </div>
+    <div id="vid-recommend-output" class="ai-output" style="margin-top:0.8rem;display:none;"></div>
+  </div>
+</div>
+<footer><div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+function filterVideos(cat, btn) {
+  document.querySelectorAll('.cat-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.video-card').forEach(c=>{
+    c.style.display=(cat==='all'||c.dataset.cat===cat)?'':'none';
+  });
+}
+async function recommendVideo() {
+  const q=document.getElementById('vid-recommend-input').value.trim();
+  if(!q){toast('Enter a topic!','error');return;}
+  const out=document.getElementById('vid-recommend-output');
+  out.style.display='block'; out.innerHTML='<span class="spinner"></span> Finding recommendations...';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        system:'You are a video curator. Recommend 3-5 educational YouTube videos with channel names and brief descriptions for the given topic. Use emojis.',
+        messages:[{role:'user',content:`Recommend videos about: ${q}`}]})});
+    const data=await res.json();
+    out.textContent=data.content?.[0]?.text||'No recommendations.';
+  }catch(e){out.textContent='Error.';}
+}
+
+function searchYouTube(){
+  const q=document.getElementById('yt-search-inp').value.trim();
+  if(!q)return;
+  const res=document.getElementById('yt-result');
+  res.style.display='block';
+  res.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;">
+    <div style="font-family:'Orbitron',monospace;color:var(--cyan);margin-bottom:0.8rem;">🔍 YouTube Results for: <strong>${q}</strong></div>
+    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(q)}" target="_blank" class="btn btn-primary" style="display:inline-block;margin:0.3rem;">▶️ Search on YouTube</a>
+    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(q+' tutorial')}" target="_blank" class="btn btn-outline" style="display:inline-block;margin:0.3rem;">📚 Tutorials</a>
+    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(q+' explained')}" target="_blank" class="btn btn-outline" style="display:inline-block;margin:0.3rem;">💡 Explained</a>
+  </div>`;
+}
+function openYouTube(){window.open('https://www.youtube.com','_blank');}
+</script>
+
+<!-- NEXUS AD SCRIPTS -->
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="https://pl29119943.profitablecpmratenetwork.com/95/36/71/953671a9b1c1310473849544757c959e.js"></script>
+<script src="https://pl29119946.profitablecpmratenetwork.com/4e/c2/c8/4ec2c859136af96e53357bc9a21d1063.js"></script>
+<script async data-cfasync="false" src="https://pl29072711.profitablecpmratenetwork.com/fe2c19526de3ee03ac6f5077ca63cdaa/invoke.js"></script>
+
+<script src="js/premium.js"></script>
+</body>
+</html>

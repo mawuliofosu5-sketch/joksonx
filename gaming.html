@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS Gaming — 70+ Games Arcade Zone</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.2rem;}
+.game-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:all 0.3s;position:relative;}
+.game-card:hover{transform:translateY(-6px);border-color:var(--magenta);box-shadow:var(--glow-mag);}
+.game-thumb{width:100%;height:120px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;background:linear-gradient(135deg,rgba(0,245,255,0.08),rgba(255,0,255,0.06));position:relative;}
+.game-thumb::after{content:'▶ PLAY';position:absolute;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--cyan);letter-spacing:2px;opacity:0;transition:opacity 0.3s;}
+.game-card:hover .game-thumb::after{opacity:1;}
+.game-info{padding:0.8rem;}
+.game-title{font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--cyan);margin-bottom:0.2rem;}
+.game-genre{font-size:0.7rem;color:var(--magenta);}
+.game-desc{font-size:0.72rem;opacity:0.65;margin-top:0.3rem;line-height:1.4;}
+.game-badge{position:absolute;top:8px;right:8px;background:var(--magenta);color:#fff;font-size:0.55rem;font-family:'Orbitron',monospace;padding:3px 8px;border-radius:4px;}
+.game-badge.new-badge{background:var(--neon-green);color:#000;}
+.game-badge.top-badge{background:var(--gold);color:#000;}
+.game-fullscreen{position:fixed;inset:0;z-index:9500;background:#000;display:none;flex-direction:column;}
+.game-fullscreen.open{display:flex;}
+.gf-bar{background:rgba(2,4,8,0.97);border-bottom:1px solid var(--cyan);padding:0.6rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-shrink:0;flex-wrap:wrap;}
+.gf-title{font-family:'Orbitron',monospace;color:var(--cyan);font-size:0.9rem;letter-spacing:2px;flex:1;}
+.gf-stats{display:flex;gap:1.5rem;font-family:'Orbitron',monospace;font-size:0.75rem;}
+.gf-stat{color:var(--gold);} .gf-stat span{color:var(--cyan);margin-left:4px;}
+.gf-controls{font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:rgba(200,230,240,0.4);}
+.gf-close{background:linear-gradient(135deg,#ff4444,#cc0000);border:none;color:#fff;padding:7px 18px;border-radius:6px;cursor:pointer;font-family:'Orbitron',monospace;font-size:0.7rem;}
+.gf-canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:#010a12;overflow:hidden;}
+#gf-canvas{display:block;}
+.game-iframe-wrap{flex:1;display:flex;flex-direction:column;}
+.game-iframe-wrap iframe{flex:1;border:none;width:100%;height:100%;}
+.lb-row{display:flex;align-items:center;gap:1rem;padding:0.7rem 0;border-bottom:1px solid var(--border);font-size:0.85rem;}
+.lb-rank{font-family:'Orbitron',monospace;color:var(--cyan);width:30px;text-align:center;}
+.lb-score{color:var(--magenta);font-weight:700;margin-left:auto;}
+.cat-tabs{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.cat-tab{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text);cursor:pointer;font-size:0.68rem;font-family:'Orbitron',monospace;transition:all 0.2s;letter-spacing:1px;}
+.cat-tab:hover,.cat-tab.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,245,255,0.06);}
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas><div class="cursor"></div><div class="cursor-ring"></div><div class="toast-container"></div>
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li><li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html" class="active">Gaming</a></li><li><a href="science.html">Science</a></li>
+    <li><a href="videos.html">Videos</a></li><li><a href="movies.html">Movies</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li><li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html">Earn 💰</a></li><li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+
+<!-- CANVAS FULLSCREEN -->
+<div class="game-fullscreen" id="gf-modal">
+  <div class="gf-bar">
+    <div class="gf-title" id="gf-title">GAME</div>
+    <div class="gf-stats">
+      <div class="gf-stat">SCORE<span id="gf-score">0</span></div>
+      <div class="gf-stat">LIVES<span id="gf-lives">3</span></div>
+      <div class="gf-stat">LEVEL<span id="gf-level">1</span></div>
+    </div>
+    <div class="gf-controls" id="gf-controls"></div>
+    <button class="gf-close" onclick="closeGame()">✕ EXIT</button>
+  </div>
+  <div class="gf-canvas-wrap"><canvas id="gf-canvas"></canvas></div>
+</div>
+
+<!-- IFRAME FULLSCREEN -->
+<div class="game-fullscreen" id="gf-iframe-modal">
+  <div class="gf-bar">
+    <div class="gf-title" id="gf-iframe-title">EXTERNAL GAME</div>
+    <button class="gf-close" onclick="closeIframeGame()">✕ EXIT GAME</button>
+  </div>
+  <div class="game-iframe-wrap">
+    <iframe id="gf-iframe" src="" allowfullscreen allow="fullscreen;autoplay"></iframe>
+  </div>
+</div>
+
+<div class="page-header">
+  <h1>🎮 ARCADE ZONE</h1>
+  <p>70+ Games — Built-in games play fullscreen right here! External games open in full view.</p>
+</div>
+
+<div class="section" style="padding-top:0">
+  <div class="cat-tabs reveal" id="cat-tabs">
+    <button class="cat-tab active" onclick="filterGames('all',this)">ALL (70+)</button>
+    <button class="cat-tab" onclick="filterGames('built',this)">🎮 BUILT-IN</button>
+    <button class="cat-tab" onclick="filterGames('action',this)">⚔️ ACTION</button>
+    <button class="cat-tab" onclick="filterGames('puzzle',this)">🧩 PUZZLE</button>
+    <button class="cat-tab" onclick="filterGames('racing',this)">🏎️ RACING</button>
+    <button class="cat-tab" onclick="filterGames('sports',this)">⚽ SPORTS</button>
+    <button class="cat-tab" onclick="filterGames('strategy',this)">♟️ STRATEGY</button>
+    <button class="cat-tab" onclick="filterGames('adventure',this)">🗺️ ADVENTURE</button>
+    <button class="cat-tab" onclick="filterGames('io',this)">🌐 .IO GAMES</button>
+  </div>
+  <div style="display:flex;gap:0.8rem;margin-bottom:1.5rem;flex-wrap:wrap;" class="reveal">
+    <input id="game-search" class="search-input" style="max-width:380px;flex:1;" placeholder="🔍 Search games..." oninput="searchGames(this.value)"/>
+    <button class="btn btn-primary" onclick="doAIPick()">🤖 AI Pick For Me</button>
+  </div>
+  <div class="games-grid reveal" id="games-grid"></div>
+
+  <!-- LEADERBOARD -->
+  <div style="margin-top:3rem;" class="reveal">
+    <div class="section-title">🏆 TOP PLAYERS</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;max-width:500px;margin:1rem auto;">
+      <div class="lb-row"><div class="lb-rank">🥇</div><div>JoksonX_PRO</div><div class="lb-score">142,450</div></div>
+      <div class="lb-row"><div class="lb-rank">🥈</div><div>NeonWolf99</div><div class="lb-score">98,320</div></div>
+      <div class="lb-row"><div class="lb-rank">🥉</div><div>CyberQueen</div><div class="lb-score">87,100</div></div>
+      <div class="lb-row"><div class="lb-rank">4</div><div>StemMaster</div><div class="lb-score">74,800</div></div>
+      <div class="lb-row"><div class="lb-rank">5</div><div>PixelKnight</div><div class="lb-score">68,230</div></div>
+      <div class="lb-row" style="border:none"><div class="lb-rank">6</div><div id="player-name-lb">YOU</div><div class="lb-score" id="player-score-lb">0</div></div>
+    </div>
+  </div>
+
+  <!-- AI COACH -->
+  <div class="ai-tutor-box reveal" style="margin-top:2rem;">
+    <div class="ai-tutor-title">🤖 AI GAMING COACH</div>
+    <p style="font-size:0.85rem;opacity:0.7;margin-bottom:1rem;">Ask for tips, strategies, or game recommendations!</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <input id="game-ai-input" style="flex:1;min-width:200px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:0.9rem;padding:10px 14px;outline:none;" placeholder="How do I beat Snake? Best strategy for 2048?"/>
+      <button class="btn btn-primary" onclick="askGameAI()">ASK AI</button>
+    </div>
+    <div id="game-ai-output" class="ai-output" style="display:none;margin-top:0.8rem;"></div>
+  </div>
+</div>
+<footer><div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6</div></footer>
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+const ALL_GAMES=[
+  // BUILT-IN
+  {id:'snake',title:'NEON SNAKE',emoji:'🐍',genre:'Arcade',cat:'built',desc:'Eat glowing pixels. Arrow Keys to move.',badge:'CLASSIC'},
+  {id:'breakout',title:'CYBER BREAKOUT',emoji:'🏓',genre:'Action',cat:'built',desc:'Mouse to control paddle. Smash all blocks!',badge:'HOT'},
+  {id:'flappy',title:'CYBER BIRD',emoji:'🐦',genre:'Skill',cat:'built',desc:'Click or Space to fly through neon obstacles!',badge:'HARD'},
+  {id:'asteroids',title:'SPACE BLASTER',emoji:'🚀',genre:'Shooter',cat:'built',desc:'Arrow Keys to fly, Space to shoot asteroids!'},
+  {id:'pong',title:'NEON PONG',emoji:'🏸',genre:'2-Player',cat:'built',desc:'W/S = P1, Up/Down = P2. First to 7 wins!'},
+  {id:'dodge',title:'CYBER DODGE',emoji:'💠',genre:'Survival',cat:'built',desc:'Arrow Keys or mouse to dodge falling objects!',badge:'NEW'},
+  {id:'tetris',title:'NEON TETRIS',emoji:'🟦',genre:'Puzzle',cat:'built',desc:'Arrow Keys to move, Up to rotate blocks!',badge:'NEW'},
+  {id:'memory',title:'MEMORY MATCH',emoji:'🃏',genre:'Puzzle',cat:'built',desc:'Click cards to find matching pairs!'},
+  // ACTION
+  {id:'templerun',title:'TEMPLE RUN 2',emoji:'🏃',genre:'Runner',cat:'action',desc:'Run from the monster in the ancient temple!',badge:'TOP',url:'https://www.crazygames.com/embed/temple-run-2'},
+  {id:'subway',title:'SUBWAY SURFERS',emoji:'🛤️',genre:'Runner',cat:'action',desc:'Surf the subway and dodge the inspector!',badge:'HOT',url:'https://www.crazygames.com/embed/subway-surfers'},
+  {id:'krunker',title:'KRUNKER.IO',emoji:'🔫',genre:'FPS',cat:'action',desc:'Epic browser FPS multiplayer action!',url:'https://krunker.io'},
+  {id:'shellshock',title:'SHELL SHOCKERS',emoji:'🥚',genre:'FPS',cat:'action',desc:'Egg-based FPS multiplayer madness!',badge:'HOT',url:'https://shellshock.io'},
+  {id:'zombs',title:'ZOMBS ROYALE',emoji:'🧟',genre:'Battle Royale',cat:'action',desc:'100-player battle royale in browser!',url:'https://zombsroyale.io'},
+  {id:'bullet',title:'BULLET FORCE',emoji:'🎯',genre:'FPS',cat:'action',desc:'Modern military FPS multiplayer!',url:'https://www.crazygames.com/embed/bullet-force-multiplayer'},
+  {id:'getaway',title:'GETAWAY SHOOTOUT',emoji:'🏃',genre:'Party',cat:'action',desc:'Race to the getaway vehicle first!',url:'https://www.crazygames.com/embed/getaway-shootout'},
+  {id:'run3',title:'RUN 3',emoji:'🌌',genre:'Runner',cat:'action',desc:'Run through space tunnels forever!',badge:'POPULAR',url:'https://www.crazygames.com/embed/run-3'},
+  {id:'slope',title:'SLOPE BALL',emoji:'⚽',genre:'Skill',cat:'action',desc:'Control a ball down an endless neon slope!',badge:'HOT',url:'https://www.crazygames.com/embed/slope'},
+  {id:'happywheels',title:'HAPPY WHEELS',emoji:'🛞',genre:'Physics',cat:'action',desc:'Ragdoll physics obstacle racing!',url:'https://www.crazygames.com/embed/happy-wheels'},
+  {id:'stickman',title:'STICKMAN FIGHTER',emoji:'🥊',genre:'Fighting',cat:'action',desc:'Beat up stickman enemies!',url:'https://www.crazygames.com/embed/stickman-fighter-epic-battle'},
+  {id:'cuberunner',title:'CUBE FIELD',emoji:'🟥',genre:'Runner',cat:'action',desc:'Fly through neon cube obstacles!',url:'https://www.crazygames.com/embed/cube-field'},
+  {id:'zombie',title:'ZOMBIE LAND',emoji:'🧠',genre:'Survival',cat:'action',desc:'Fight off waves of zombies!',url:'https://www.crazygames.com/embed/zombie-land'},
+  {id:'fnaf',title:'FIVE NIGHTS',emoji:'🐻',genre:'Horror',cat:'action',desc:'Survive the night at Freddy\'s!',url:'https://www.crazygames.com/embed/five-nights-at-freddys'},
+  {id:'rolly',title:'ROLLY VORTEX',emoji:'🌀',genre:'Skill',cat:'action',desc:'Roll through vortex tubes at full speed!',url:'https://www.crazygames.com/embed/rolly-vortex'},
+  {id:'doodle',title:'DOODLE JUMP',emoji:'🐸',genre:'Platformer',cat:'action',desc:'Jump your way to the top!',url:'https://www.crazygames.com/embed/doodle-jump'},
+  {id:'crossy',title:'CROSSY ROAD',emoji:'🐔',genre:'Arcade',cat:'action',desc:'Help the chicken cross the road!',url:'https://www.crazygames.com/embed/crossy-road-online'},
+  {id:'pinball',title:'NEON PINBALL',emoji:'🎰',genre:'Arcade',cat:'action',desc:'Classic pinball in neon style!',url:'https://www.crazygames.com/embed/pinball'},
+  {id:'warbrokers',title:'WAR BROKERS',emoji:'🪖',genre:'FPS',cat:'action',desc:'Battle royale with tanks and planes!',url:'https://warbrokers.io'},
+  // PUZZLE
+  {id:'2048',title:'2048',emoji:'🔢',genre:'Puzzle',cat:'puzzle',desc:'Merge tiles to reach 2048!',badge:'CLASSIC',url:'https://www.crazygames.com/embed/2048'},
+  {id:'fireboy',title:'FIREBOY & WATERGIRL',emoji:'🔥',genre:'Co-op',cat:'puzzle',desc:'Co-op puzzle adventure in the temple!',badge:'POPULAR',url:'https://www.crazygames.com/embed/fireboy-and-watergirl-1'},
+  {id:'tetrisonline',title:'TETRIS ONLINE',emoji:'🟨',genre:'Puzzle',cat:'puzzle',desc:'Classic Tetris in browser!',url:'https://www.crazygames.com/embed/jstris'},
+  {id:'sudoku',title:'SUDOKU',emoji:'🧩',genre:'Puzzle',cat:'puzzle',desc:'Fill the grid with numbers 1-9!',url:'https://www.crazygames.com/embed/sudoku'},
+  {id:'mahjong',title:'MAHJONG CLASSIC',emoji:'🀄',genre:'Puzzle',cat:'puzzle',desc:'Classic tile-matching puzzle game!',url:'https://www.crazygames.com/embed/mahjong-classic'},
+  {id:'jewel',title:'JEWEL BLAST',emoji:'💎',genre:'Match-3',cat:'puzzle',desc:'Match 3 jewels to clear the board!',url:'https://www.crazygames.com/embed/jewel-blast'},
+  {id:'wordwipe',title:'WORD WIPE',emoji:'🔤',genre:'Word',cat:'puzzle',desc:'Connect letters to form words!',url:'https://www.crazygames.com/embed/word-wipe'},
+  {id:'hangman',title:'HANGMAN AI',emoji:'🎯',genre:'Word',cat:'puzzle',desc:'Guess the word before time runs out!',url:'https://www.crazygames.com/embed/hangman'},
+  {id:'boxrob',title:'BOX ROBOT',emoji:'🤖',genre:'Puzzle',cat:'puzzle',desc:'Guide the robot through tricky puzzles!',url:'https://www.crazygames.com/embed/box-robot'},
+  // RACING
+  {id:'moto',title:'MOTO X3M',emoji:'🏍️',genre:'Racing',cat:'racing',desc:'Crazy motorcycle stunt racing!',badge:'TOP',url:'https://www.crazygames.com/embed/moto-x3m'},
+  {id:'madalin',title:'MADALIN CARS',emoji:'🏎️',genre:'Racing',cat:'racing',desc:'Drift and race luxury cars online!',url:'https://www.crazygames.com/embed/madalin-cars-multiplayer'},
+  {id:'drift',title:'DRIFT HUNTERS',emoji:'🚗',genre:'Racing',cat:'racing',desc:'Master the art of drifting!',badge:'HOT',url:'https://www.crazygames.com/embed/drift-hunters'},
+  {id:'hillclimb',title:'HILL CLIMB RACING',emoji:'🚙',genre:'Racing',cat:'racing',desc:'Race up hills without flipping!',url:'https://www.crazygames.com/embed/hill-climb-racing'},
+  {id:'smashkarts',title:'SMASH KARTS',emoji:'🔴',genre:'Kart Racing',cat:'racing',desc:'3D kart racing shooter game!',badge:'NEW',url:'https://smashkarts.io'},
+  {id:'formula',title:'FORMULA RUSH',emoji:'🏁',genre:'F1 Racing',cat:'racing',desc:'Race to the finish in F1 cars!',url:'https://www.crazygames.com/embed/formula-rush'},
+  // SPORTS
+  {id:'basketball',title:'BASKETBALL STARS',emoji:'🏀',genre:'Sports',cat:'sports',desc:'1v1 basketball multiplayer!',badge:'POPULAR',url:'https://www.crazygames.com/embed/basketball-stars'},
+  {id:'soccer',title:'SOCCER SKILLS',emoji:'⚽',genre:'Sports',cat:'sports',desc:'Score goals in this soccer game!',url:'https://www.crazygames.com/embed/soccer-skills-euro-cup'},
+  {id:'tennis',title:'TENNIS OPEN',emoji:'🎾',genre:'Sports',cat:'sports',desc:'Play tennis against an AI opponent!',url:'https://www.crazygames.com/embed/tennis-open-2020'},
+  {id:'golf',title:'MINI GOLF',emoji:'⛳',genre:'Sports',cat:'sports',desc:'Aim your shot and get a hole in one!',url:'https://www.crazygames.com/embed/golf-online'},
+  {id:'badminton',title:'BADMINTON CLASH',emoji:'🏸',genre:'Sports',cat:'sports',desc:'Play badminton online!',url:'https://www.crazygames.com/embed/badminton-clash'},
+  {id:'nock',title:'NOCK ARCHERY',emoji:'🏹',genre:'Sports',cat:'sports',desc:'Archery battle royale!',url:'https://nock.io'},
+  // STRATEGY
+  {id:'chess',title:'CHESS ONLINE',emoji:'♟️',genre:'Strategy',cat:'strategy',desc:'Classic chess against AI or online!',badge:'CLASSIC',url:'https://www.chess.com/play/computer'},
+  {id:'checkers',title:'CHECKERS',emoji:'🔴',genre:'Strategy',cat:'strategy',desc:'Classic board game strategy!',url:'https://www.crazygames.com/embed/checkers'},
+  {id:'among',title:'AMONG US ONLINE',emoji:'🚀',genre:'Social',cat:'strategy',desc:'Find the impostor! Play online!',badge:'POPULAR',url:'https://www.crazygames.com/embed/among-us-online-edition'},
+  {id:'pokemon',title:'POKÉMON SHOWDOWN',emoji:'⚡',genre:'RPG',cat:'strategy',desc:'Battle with Pokémon teams online!',url:'https://play.pokemonshowdown.com'},
+  {id:'towerdef',title:'TOWER DEFENSE',emoji:'🏰',genre:'Strategy',cat:'strategy',desc:'Build towers and defend your base!',url:'https://www.crazygames.com/embed/tower-defense-kingdom'},
+  {id:'gartic',title:'GARTIC.IO',emoji:'🎨',genre:'Drawing',cat:'strategy',desc:'Draw and guess with friends online!',url:'https://gartic.io'},
+  {id:'skribbl',title:'SKRIBBL.IO',emoji:'✏️',genre:'Drawing',cat:'strategy',desc:'Online drawing and guessing game!',url:'https://skribbl.io'},
+  {id:'risk',title:'WARSQUAD',emoji:'🗺️',genre:'Strategy',cat:'strategy',desc:'Strategy war game — dominate the map!',url:'https://www.crazygames.com/embed/warsquad'},
+  {id:'minimetro',title:'MINI METRO',emoji:'🚇',genre:'Strategy',cat:'strategy',desc:'Design an efficient subway network!',url:'https://www.crazygames.com/embed/mini-metro-online'},
+  // ADVENTURE
+  {id:'minecraft',title:'MINECRAFT CLASSIC',emoji:'🧱',genre:'Sandbox',cat:'adventure',desc:'Official classic Minecraft in browser!',badge:'POPULAR',url:'https://classic.minecraft.net'},
+  {id:'blockworld',title:'BLOCK WORLD 3D',emoji:'🌍',genre:'Building',cat:'adventure',desc:'Build anything in 3D block world!',url:'https://www.crazygames.com/embed/block-world-3d'},
+  {id:'survivalcraft',title:'SURVIVALCRAFT',emoji:'🪓',genre:'Survival',cat:'adventure',desc:'Survive the wilderness!',url:'https://www.crazygames.com/embed/survivalcraft'},
+  // .IO GAMES
+  {id:'paperio',title:'PAPER.IO 2',emoji:'📄',genre:'.IO Strategy',cat:'io',desc:'Capture territory and crush rivals!',badge:'MULTIPLAYER',url:'https://www.crazygames.com/embed/paper-io-2'},
+  {id:'slither',title:'SLITHER.IO',emoji:'🐍',genre:'.IO',cat:'io',desc:'Eat glowing orbs, grow bigger than rivals!',url:'https://www.crazygames.com/embed/slither-io'},
+  {id:'agar',title:'AGAR.IO',emoji:'⭕',genre:'.IO',cat:'io',desc:'Eat smaller cells to grow bigger!',url:'https://agar.io'},
+  {id:'diep',title:'DIEP.IO',emoji:'🔵',genre:'.IO Shooter',cat:'io',desc:'Shoot shapes, level up your tank!',url:'https://www.crazygames.com/embed/diepiocom'},
+  {id:'powerline',title:'POWERLINE.IO',emoji:'⚡',genre:'.IO',cat:'io',desc:'Grow your electric snake!',url:'https://powerline.io'},
+  {id:'flappybird',title:'FLAPPY BIRD',emoji:'🐦',genre:'Skill',cat:'action',desc:'Classic flappy bird — tap to fly!',url:'https://flappybird.io'},
+];
+
+let currentCat='all', currentSearch='';
+
+function renderGames(){
+  const grid=document.getElementById('games-grid');
+  const games=ALL_GAMES.filter(g=>{
+    const mc=currentCat==='all'||g.cat===currentCat;
+    const ms=currentSearch===''||g.title.toLowerCase().includes(currentSearch)||g.genre.toLowerCase().includes(currentSearch)||g.desc.toLowerCase().includes(currentSearch);
+    return mc&&ms;
+  });
+  grid.innerHTML=games.map(g=>`
+    <div class="game-card" onclick="${g.url?`launchExternal('${g.url}','${g.title}')`:`launchBuiltin('${g.id}')`}">
+      <div class="game-thumb">${g.emoji}</div>
+      ${g.badge?`<div class="game-badge ${g.badge==='NEW'?'new-badge':g.badge==='TOP'?'top-badge':''}">${g.badge}</div>`:''}
+      <div class="game-info">
+        <div class="game-title">${g.title}</div>
+        <div class="game-genre">${g.genre}${g.cat==='built'?'  🎮 BUILT-IN':''}</div>
+        <div class="game-desc">${g.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+function filterGames(cat,btn){
+  currentCat=cat;
+  document.querySelectorAll('.cat-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGames();
+}
+
+function searchGames(val){currentSearch=val.toLowerCase();renderGames();}
+
+function launchExternal(url,title){
+  document.getElementById('gf-iframe-title').textContent='🎮 '+title;
+  document.getElementById('gf-iframe').src=url;
+  document.getElementById('gf-iframe-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeIframeGame(){
+  document.getElementById('gf-iframe-modal').classList.remove('open');
+  document.getElementById('gf-iframe').src='';
+  document.body.style.overflow='';
+}
+
+let gameLoop=null, gameState={};
+
+function launchBuiltin(name){
+  const modal=document.getElementById('gf-modal');
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+  const canvas=document.getElementById('gf-canvas');
+  const wrap=canvas.parentElement;
+  canvas.width=Math.min(wrap.clientWidth,900);
+  canvas.height=Math.min(wrap.clientHeight,600);
+  document.getElementById('gf-score').textContent='0';
+  document.getElementById('gf-lives').textContent='3';
+  document.getElementById('gf-level').textContent='1';
+  if(gameLoop)cancelAnimationFrame(gameLoop);
+  // Remove old listeners
+  if(gameState.keyHandler){document.removeEventListener('keydown',gameState.keyHandler);document.removeEventListener('keyup',gameState.keyHandler);}
+  if(gameState.mouseHandler)canvas.removeEventListener('mousemove',gameState.mouseHandler);
+  gameState={};
+  const titles={snake:'🐍 NEON SNAKE',breakout:'🏓 CYBER BREAKOUT',flappy:'🐦 CYBER BIRD',asteroids:'🚀 SPACE BLASTER',pong:'🏸 NEON PONG',dodge:'💠 CYBER DODGE',tetris:'🟦 NEON TETRIS',memory:'🃏 MEMORY MATCH'};
+  const controls={snake:'ARROW KEYS: Move',breakout:'MOUSE: Paddle | CLICK: Launch',flappy:'SPACE/CLICK: Flap',asteroids:'ARROWS: Move | SPACE: Shoot',pong:'W/S: P1 | UP/DOWN: P2',dodge:'ARROWS/MOUSE: Dodge',tetris:'ARROWS: Move | UP: Rotate',memory:'CLICK: Flip Cards'};
+  document.getElementById('gf-title').textContent=titles[name]||name;
+  document.getElementById('gf-controls').textContent=controls[name]||'';
+  ({snake:initSnake,breakout:initBreakout,flappy:initFlappy,asteroids:initAsteroids,pong:initPong,dodge:initDodge,tetris:initTetris,memory:initMemory})[name]?.(canvas);
+}
+
+function closeGame(){
+  document.getElementById('gf-modal').classList.remove('open');
+  document.body.style.overflow='';
+  if(gameLoop)cancelAnimationFrame(gameLoop);
+  if(gameState.keyHandler){document.removeEventListener('keydown',gameState.keyHandler);document.removeEventListener('keyup',gameState.keyHandler);}
+}
+
+function setScore(s){document.getElementById('gf-score').textContent=s;}
+function setLives(l){document.getElementById('gf-lives').textContent=l;}
+function setLevel(l){document.getElementById('gf-level').textContent=l;}
+
+// ---- SNAKE ----
+function initSnake(canvas){
+  const ctx=canvas.getContext('2d'),CELL=20,COLS=Math.floor(canvas.width/CELL),ROWS=Math.floor(canvas.height/CELL);
+  let snake=[{x:10,y:10}],dir={x:1,y:0},nextDir={x:1,y:0};
+  let food={x:15,y:10},score=0,speed=130,last=0;
+  function rf(){return{x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)};}
+  gameState.keyHandler=e=>{
+    if(e.key==='ArrowUp'&&dir.y!==1)nextDir={x:0,y:-1};
+    if(e.key==='ArrowDown'&&dir.y!==-1)nextDir={x:0,y:1};
+    if(e.key==='ArrowLeft'&&dir.x!==1)nextDir={x:-1,y:0};
+    if(e.key==='ArrowRight'&&dir.x!==-1)nextDir={x:1,y:0};
+  };
+  document.addEventListener('keydown',gameState.keyHandler);
+  function draw(ts){
+    gameLoop=requestAnimationFrame(draw);
+    if(ts-last<speed)return;last=ts;
+    dir={...nextDir};
+    const head={x:(snake[0].x+dir.x+COLS)%COLS,y:(snake[0].y+dir.y+ROWS)%ROWS};
+    if(snake.some(s=>s.x===head.x&&s.y===head.y)){ctx.fillStyle='rgba(255,0,0,0.4)';ctx.fillRect(0,0,canvas.width,canvas.height);setTimeout(()=>{score=0;snake=[{x:10,y:10}];dir={x:1,y:0};setScore(0);},700);return;}
+    snake.unshift(head);
+    if(head.x===food.x&&head.y===food.y){food=rf();score++;setScore(score);if(score%5===0){speed=Math.max(55,speed-12);setLevel(Math.floor(score/5)+1);}}
+    else snake.pop();
+    ctx.fillStyle='#010a12';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#ff00ff';ctx.shadowBlur=14;ctx.shadowColor='#ff00ff';ctx.fillRect(food.x*CELL+3,food.y*CELL+3,CELL-6,CELL-6);ctx.shadowBlur=0;
+    snake.forEach((s,i)=>{ctx.fillStyle=i===0?'#00f5ff':`rgba(0,245,255,${Math.max(0.2,1-i/snake.length)})`;if(i===0){ctx.shadowBlur=18;ctx.shadowColor='#00f5ff';}ctx.fillRect(s.x*CELL+1,s.y*CELL+1,CELL-2,CELL-2);ctx.shadowBlur=0;});
+  }
+  gameLoop=requestAnimationFrame(draw);
+}
+
+// ---- BREAKOUT ----
+function initBreakout(canvas){
+  const ctx=canvas.getContext('2d');
+  let paddle={x:canvas.width/2-60,w:120},ballX=canvas.width/2,ballY=canvas.height-80,dx=4.5,dy=-4.5;
+  let bricks=[],score=0,lives=3;
+  const BW=(canvas.width-40)/10,BH=26;
+  for(let r=0;r<5;r++)for(let c=0;c<10;c++)bricks.push({x:20+c*BW,y:60+r*(BH+4),w:BW-4,h:BH,alive:true,col:`hsl(${r*36+c*8},80%,55%)`});
+  gameState.mouseHandler=e=>{const rect=canvas.getBoundingClientRect();paddle.x=Math.max(0,Math.min(canvas.width-paddle.w,e.clientX-rect.left-paddle.w/2));};
+  canvas.addEventListener('mousemove',gameState.mouseHandler);
+  function draw(){
+    gameLoop=requestAnimationFrame(draw);
+    ctx.fillStyle='#010a12';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ballX+=dx;ballY+=dy;
+    if(ballX<8||ballX>canvas.width-8)dx=-dx;
+    if(ballY<8)dy=-dy;
+    if(ballY>canvas.height-34&&ballX>paddle.x&&ballX<paddle.x+paddle.w){dy=-Math.abs(dy);dx+=(Math.random()-0.5);}
+    if(ballY>canvas.height){lives--;setLives(lives);ballX=canvas.width/2;ballY=canvas.height-80;if(lives<=0){bricks.forEach(b=>b.alive=true);lives=3;score=0;setScore(0);setLives(3);}}
+    ctx.fillStyle='#00f5ff';ctx.shadowBlur=10;ctx.shadowColor='#00f5ff';ctx.fillRect(paddle.x,canvas.height-22,paddle.w,12);ctx.shadowBlur=0;
+    ctx.beginPath();ctx.arc(ballX,ballY,8,0,Math.PI*2);ctx.fillStyle='#ff00ff';ctx.shadowBlur=14;ctx.shadowColor='#ff00ff';ctx.fill();ctx.shadowBlur=0;
+    bricks.forEach((b,i)=>{if(!b.alive)return;ctx.fillStyle=b.col;ctx.shadowBlur=4;ctx.shadowColor=b.col;ctx.fillRect(b.x,b.y,b.w,b.h);ctx.shadowBlur=0;
+      if(ballX>b.x&&ballX<b.x+b.w&&ballY>b.y&&ballY<b.y+b.h){b.alive=false;dy=-dy;score++;setScore(score);}});
+  }
+  gameLoop=requestAnimationFrame(draw);
+}
+
+// ---- FLAPPY ----
+function initFlappy(canvas){
+  const ctx=canvas.getContext('2d');
+  let bird={y:canvas.height/2,v:0},pipes=[],score=0,frame=0,alive=true;
+  function addPipe(){const h=70+Math.random()*(canvas.height-220);pipes.push({x:canvas.width,top:h,bot:h+160,passed:false});}
+  addPipe();
+  const flap=()=>{if(alive)bird.v=-10;else{bird={y:canvas.height/2,v:0};pipes=[];score=0;alive=true;setScore(0);}};
+  canvas.addEventListener('click',flap);
+  gameState.keyHandler=e=>{if(e.code==='Space'){e.preventDefault();flap();}};
+  document.addEventListener('keydown',gameState.keyHandler);
+  function draw(){
+    gameLoop=requestAnimationFrame(draw);
+    ctx.fillStyle='#010a12';ctx.fillRect(0,0,canvas.width,canvas.height);
+    frame++;if(frame%90===0)addPipe();
+    bird.v+=0.55;bird.y+=bird.v;
+    if(bird.y<0||bird.y>canvas.height)alive=false;
+    pipes=pipes.filter(p=>p.x>-55);
+    pipes.forEach(p=>{p.x-=3;ctx.fillStyle='#39ff14';ctx.shadowBlur=10;ctx.shadowColor='#39ff14';ctx.fillRect(p.x,0,50,p.top);ctx.fillRect(p.x,p.bot,50,canvas.height);ctx.shadowBlur=0;
+      if(!p.passed&&p.x<80){p.passed=true;score++;setScore(score);setLevel(Math.floor(score/5)+1);}
+      if(p.x<120&&p.x>30&&(bird.y<p.top||bird.y>p.bot))alive=false;});
+    ctx.beginPath();ctx.arc(80,bird.y,14,0,Math.PI*2);ctx.fillStyle=alive?'#ffd700':'#ff4444';ctx.shadowBlur=14;ctx.shadowColor=ctx.fillStyle;ctx.fill();ctx.shadowBlur=0;
+    if(!alive){ctx.fillStyle='rgba(255,0,0,0.25)';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#fff';ctx.font='bold 22px Orbitron,monospace';ctx.textAlign='center';ctx.fillText('GAME OVER — CLICK TO RETRY',canvas.width/2,canvas.height/2);}
+  }
+  gameLoop=requestAnimationFrame(draw);
+}
+
+// ---- ASTEROIDS ----
+function initAsteroids(canvas){
+  const ctx=canvas.getContext('2d');
+  let ship={x:canvas.width/2,y:canvas.height/2,a:0,vx:0,vy:0};
+  let bullets=[],asteroids=[],score=0,lives=3;
+  for(let i=0;i<6;i++)asteroids.push(na(60));
+  function na(r){return{x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*2.5,vy:(Math.random()-0.5)*2.5,r};}
+  const keys={};
+  gameState.keyHandler=e=>{keys[e.code]=e.type==='keydown';if(e.code==='Space'&&e.type==='keydown')bullets.push({x:ship.x,y:ship.y,vx:Math.sin(ship.a)*10,vy:-Math.cos(ship.a)*10,life:65});};
+  document.addEventListener('keydown',gameState.keyHandler);
+  document.addEventListener('keyup',gameState.keyHandler);
+  function draw(){
+    gameLoop=requestAnimationFrame(draw);
+    ctx.fillStyle='rgba(1,10,18,0.25)';ctx.fillRect(0,0,canvas.width,canvas.height);
+    if(keys['ArrowLeft'])ship.a-=0.07;if(keys['ArrowRight'])ship.a+=0.07;
+    if(keys['ArrowUp']){ship.vx+=Math.sin(ship.a)*0.35;ship.vy-=Math.cos(ship.a)*0.35;}
+    ship.vx*=0.98;ship.vy*=0.98;
+    ship.x=(ship.x+ship.vx+canvas.width)%canvas.width;ship.y=(ship.y+ship.vy+canvas.height)%canvas.height;
+    ctx.save();ctx.translate(ship.x,ship.y);ctx.rotate(ship.a);ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(12,14);ctx.lineTo(-12,14);ctx.closePath();ctx.strokeStyle='#00f5ff';ctx.shadowBlur=14;ctx.shadowColor='#00f5ff';ctx.stroke();ctx.restore();ctx.shadowBlur=0;
+    bullets.forEach((b,i)=>{b.x+=b.vx;b.y+=b.vy;b.life--;if(b.life<=0){bullets.splice(i,1);return;}ctx.beginPath();ctx.arc(b.x,b.y,3,0,Math.PI*2);ctx.fillStyle='#ff00ff';ctx.shadowBlur=8;ctx.shadowColor='#ff00ff';ctx.fill();ctx.shadowBlur=0;});
+    asteroids.forEach((a,ai)=>{a.x=(a.x+a.vx+canvas.width)%canvas.width;a.y=(a.y+a.vy+canvas.height)%canvas.height;ctx.beginPath();ctx.arc(a.x,a.y,a.r,0,Math.PI*2);ctx.strokeStyle='#ffd700';ctx.shadowBlur=8;ctx.shadowColor='#ffd700';ctx.stroke();ctx.shadowBlur=0;
+      bullets.forEach((b,bi)=>{if(Math.hypot(b.x-a.x,b.y-a.y)<a.r){bullets.splice(bi,1);score+=10;setScore(score);if(a.r>25){asteroids.push(na(a.r/2));asteroids.push(na(a.r/2));}asteroids.splice(ai,1);}});
+      if(Math.hypot(ship.x-a.x,ship.y-a.y)<a.r+10){lives--;setLives(lives);ship.x=canvas.width/2;ship.y=canvas.height/2;ship.vx=0;ship.vy=0;}});
+    if(asteroids.length===0){for(let i=0;i<8;i++)asteroids.push(na(60));}
+  }
+  gameLoop=requestAnimationFrame(draw);
+}
+
+// ---- PONG ----
+function initPong(canvas){
+  const ctx=canvas.getContext('2d');
+  let p1={y:canvas.height/2-50,s:0},p2={y:canvas.height/2-50,s:0};
+  let ball={x:canvas.width/2,y:canvas.height/2,vx:4,vy:3};
+  const PH=100,PW=14,keys={};
+  gameState.keyHandler=e=>{keys[e.code]=e.type==='keydown';};
+  document.addEventListener('keydown',gameState.keyHandler);document.addEventListener('keyup',gameState.keyHandler);
+  function draw(){
+    gameLoop=requestAnimationFrame(draw);
+    ctx.fillStyle='#010a12';ctx.fillRect(0,0,canvas.width,canvas.height);
+    if(keys['KeyW'])p1.y=Math.max(0,p1.y-6);if(keys['KeyS'])p1.y=Math.min(canvas.height-PH,p1.y+6);
+    if(keys['ArrowUp'])p2.y=Math.max(0,p2.y-6);if(keys['ArrowDown'])p2.y=Math.min(canvas.height-PH,p2.y+6);
+    ball.x+=ball.vx;ball.y+=ball.vy;
+    if(ball.y<0||ball.y>canvas.height)ball.vy=-ball.vy;
+    if(ball.x<30&&ball.y>p1.y&&ball.y<p1.y+PH){ball.vx=Math.abs(ball.vx)+0.2;ball.vy+=(Math.random()-0.5)*1.5;}
+    if(ball.x>canvas.width-30&&ball.y>p2.y&&ball.y<p2.y+PH){ball.vx=-(Math.abs(ball.vx)+0.2);}
+    if(ball.x<0){p2.s++;ball.x=canvas.width/2;ball.y=canvas.height/2;ball.vx=4;}
+    if(ball.x>canvas.width){p1.s++;ball.x=canvas.width/2;ball.y=canvas.height/2;ball.vx=-4;}
+    setScore(p1.s+' — '+p2.s);
+    ctx.setLineDash([8,8]);ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.beginPath();ctx.moveTo(canvas.width/2,0);ctx.lineTo(canvas.width/2,canvas.height);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#00f5ff';ctx.shadowBlur=10;ctx.shadowColor='#00f5ff';ctx.fillRect(16,p1.y,PW,PH);
+    ctx.fillStyle='#ff00ff';ctx.shadowColor='#ff00ff';ctx.fillRect(canvas.width-30,p2.y,PW,PH);ctx.shadowBlur=0;
+    ctx.beginPath();ctx.arc(ball.x,ball.y,8,0,Math.PI*2);ctx.fillStyle='#ffd700';ctx.shadowBlur=14;ctx.shadowColor='#ffd700';ctx.fill();ctx.shadowBlur=0;
+  }
+  gameLoop=requestAnimationFrame(draw);
+}
+
+// ---- DODGE ----
+function initDodge(canvas){
+  const ctx=canvas.getContext('2d');
+  let player={x:canvas.width/2,y:canvas.height-60};
+  let obstacles=[],score=0,lives=3,speed=3,frame=0;
+  gameState.keyHandler=e=>{if(e.key==='ArrowLeft')player.x=Math.max(16,player.x-22);if(e.key==='ArrowRight')player.x=Math.min(canvas.width-16,player.x+22);};
+  gameState.mouseHandler=e=>{const rect=canvas.getBoundingClientRect();player.x=Math.max(16,Math.min(canvas.width-16,e.clientX-rect.left));};
+  document.addEventListener('keydown',gameState.keyHandler);canvas.addEventListener('mousemove',gameState.mouseHandler);
+  function draw(){
+    gameLoop=requestAnimationFrame(draw);frame++;
+    ctx.fillStyle='rgba(1,10,18,0.35)';ctx.fillRect(0,0,canvas.width,canvas.height);
+    if(frame%28===0)obstacles.push({x:Math.random()*canvas.width,y:-30,w:38+Math.random()*58,h:18,c:'hsl('+Math.random()*360+',80%,55%)'});
+    if(frame%180===0){speed+=0.4;setLevel(Math.round(speed));}
+    score++;setScore(score);
+    obstacles.forEach((o,i)=>{o.y+=speed;ctx.fillStyle=o.c;ctx.shadowBlur=7;ctx.shadowColor=o.c;ctx.fillRect(o.x-o.w/2,o.y-o.h/2,o.w,o.h);ctx.shadowBlur=0;
+      if(o.y>canvas.height)obstacles.splice(i,1);
+      if(Math.abs(player.x-o.x)<o.w/2+14&&Math.abs(player.y-o.y)<o.h/2+14){lives--;setLives(lives);obstacles.splice(i,1);if(lives<=0){score=0;lives=3;speed=3;obstacles=[];frame=0;setScore(0);setLives(3);setLevel(1);}}});
+    ctx.beginPath();ctx.arc(player.x,player.y,15,0,Math.PI*2);ctx.fillStyle='#00f5ff';ctx.shadowBlur=18;ctx.shadowColor='#00f5ff';ctx.fill();ctx.shadowBlur=0;
+  }
+  gameLoop=requestAnimationFrame(draw);
+}
+
+// ---- TETRIS ----
+function initTetris(canvas){
+  const ctx=canvas.getContext('2d');
+  const COLS=10,ROWS=20,CELL=Math.floor(Math.min(canvas.width/14,canvas.height/22));
+  const ox=Math.floor((canvas.width-COLS*CELL)/2),oy=20;
+  const SHAPES=[[[1,1,1,1]],[[1,1],[1,1]],[[1,1,1],[0,1,0]],[[1,1,1],[1,0,0]],[[1,1,1],[0,0,1]],[[0,1,1],[1,1,0]],[[1,1,0],[0,1,1]]];
+  const COLS_C=['#00f5ff','#ffd700','#ff00ff','#ff8800','#39ff14','#ff4444','#8800ff'];
+  let board=Array.from({length:ROWS},()=>Array(COLS).fill(0));
+  let piece=np(),score=0,linesCleared=0,speed=520,last=0;
+  function np(){const i=Math.floor(Math.random()*SHAPES.length);return{shape:SHAPES[i],color:COLS_C[i],x:3,y:0};}
+  function valid(p,dx=0,dy=0,s=p.shape){return s.every((row,r)=>row.every((c,col)=>!c||(p.x+col+dx>=0&&p.x+col+dx<COLS&&p.y+r+dy<ROWS&&!board[p.y+r+dy]?.[p.x+col+dx])));}
+  function place(){piece.shape.forEach((row,r)=>row.forEach((c,col)=>{if(c)board[piece.y+r][piece.x+col]=piece.color;}));let cl=0;for(let r=ROWS-1;r>=0;r--){if(board[r].every(c=>c)){board.splice(r,1);board.unshift(Array(COLS).fill(0));cl++;r++;}}score+=cl*100;linesCleared+=cl;setScore(score);if(linesCleared%10===0&&linesCleared>0){speed=Math.max(100,speed-50);setLevel(Math.floor(linesCleared/10)+1);}piece=np();if(!valid(piece)){board=Array.from({length:ROWS},()=>Array(COLS).fill(0));score=0;setScore(0);}}
+  gameState.keyHandler=e=>{if(e.key==='ArrowLeft'&&valid(piece,-1,0))piece.x--;if(e.key==='ArrowRight'&&valid(piece,1,0))piece.x++;if(e.key==='ArrowDown'&&valid(piece,0,1))piece.y++;if(e.key==='ArrowUp'){const r=piece.shape[0].map((_,i)=>piece.shape.map(row=>row[i]).reverse());if(valid(piece,0,0,r))piece.shape=r;}};
+  document.addEventListener('keydown',gameState.keyHandler);
+  function draw(ts){
+    gameLoop=requestAnimationFrame(draw);
+    if(ts-last<speed){rB();return;}last=ts;
+    if(valid(piece,0,1))piece.y++;else place();rB();
+  }
+  function rB(){ctx.fillStyle='#010a12';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='rgba(0,245,255,0.12)';ctx.strokeRect(ox-1,oy-1,COLS*CELL+2,ROWS*CELL+2);
+    board.forEach((row,r)=>row.forEach((c,col)=>{if(c){ctx.fillStyle=c;ctx.shadowBlur=5;ctx.shadowColor=c;ctx.fillRect(ox+col*CELL+1,oy+r*CELL+1,CELL-2,CELL-2);ctx.shadowBlur=0;}}));
+    piece.shape.forEach((row,r)=>row.forEach((c,col)=>{if(c){ctx.fillStyle=piece.color;ctx.shadowBlur=10;ctx.shadowColor=piece.color;ctx.fillRect(ox+(piece.x+col)*CELL+1,oy+(piece.y+r)*CELL+1,CELL-2,CELL-2);ctx.shadowBlur=0;}}));}
+  gameLoop=requestAnimationFrame(draw);
+}
+
+// ---- MEMORY ----
+function initMemory(canvas){
+  const ctx=canvas.getContext('2d');
+  const EMOJIS=['🎮','🚀','⚡','💎','🔥','🌟','🎯','🏆'];
+  let cards=[...EMOJIS,...EMOJIS].sort(()=>Math.random()-0.5).map((e,i)=>({emoji:e,flipped:false,matched:false,i}));
+  let selected=[],score=0;
+  const COLS=4,ROWS=4,CW=Math.floor((canvas.width-50)/COLS),CH=Math.floor((canvas.height-50)/ROWS);
+  canvas.addEventListener('click',e=>{
+    const rect=canvas.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const col=Math.floor((mx-25)/CW),row=Math.floor((my-25)/CH),idx=row*COLS+col;
+    if(idx<0||idx>=cards.length)return;
+    const card=cards[idx];
+    if(card.matched||card.flipped||selected.length>=2)return;
+    card.flipped=true;selected.push(idx);
+    if(selected.length===2){if(cards[selected[0]].emoji===cards[selected[1]].emoji){cards[selected[0]].matched=cards[selected[1]].matched=true;score+=10;setScore(score);selected=[];}
+      else setTimeout(()=>{cards[selected[0]].flipped=cards[selected[1]].flipped=false;selected=[];},800);}
+  });
+  function draw(){
+    gameLoop=requestAnimationFrame(draw);ctx.fillStyle='#010a12';ctx.fillRect(0,0,canvas.width,canvas.height);
+    cards.forEach((c,i)=>{const col=i%COLS,row=Math.floor(i/COLS),x=25+col*CW,y=25+row*CH;
+      ctx.fillStyle=c.matched?'rgba(57,255,20,0.18)':c.flipped?'rgba(0,245,255,0.12)':'rgba(0,245,255,0.03)';
+      ctx.strokeStyle=c.matched?'#39ff14':c.flipped?'#00f5ff':'rgba(0,245,255,0.25)';
+      ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x+3,y+3,CW-6,CH-6,8);else ctx.rect(x+3,y+3,CW-6,CH-6);ctx.fill();ctx.stroke();
+      if(c.flipped||c.matched){ctx.font=`${Math.min(CW,CH)*0.42}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c.emoji,x+CW/2,y+CH/2);}});
+  }
+  gameLoop=requestAnimationFrame(draw);
+}
+
+async function askGameAI(){
+  const input=document.getElementById('game-ai-input'),out=document.getElementById('game-ai-output');
+  if(!input.value.trim())return;
+  out.style.display='block';out.innerHTML='<span>⚡ NEXUS AI thinking...</span>';
+  try{const r=await nexusAI('You are NEXUS Gaming Coach AI. Give fun, helpful gaming tips and strategies. Use emojis. Be energetic and motivating!',input.value);out.innerHTML=r.replace(/\n/g,'<br>');}
+  catch(e){out.innerHTML='⚠️ Error — check connection and try again!';}
+}
+
+async function doAIPick(){
+  const out=document.getElementById('game-ai-output'),input=document.getElementById('game-ai-input');
+  out.style.display='block';out.innerHTML='<span>🤖 AI picking the best game for you...</span>';
+  try{const r=await nexusAI('You are NEXUS Gaming AI. Recommend one game from this list with a short exciting description. Games: Neon Snake, Cyber Breakout, Cyber Bird (Flappy), Space Blaster, Neon Pong, Cyber Dodge, Neon Tetris, Memory Match, Temple Run, Krunker, 2048, Slither.io, Run 3, Slope Ball, Chess Online, Among Us. Keep it very short and hype!','What single game should I play right now?');out.innerHTML=r.replace(/\n/g,'<br>');}
+  catch(e){out.innerHTML='⚠️ Error — check connection!';}
+  input.value='';
+}
+
+renderGames();
+document.getElementById('player-score-lb').textContent=(parseInt(localStorage.getItem('nexus_gamescore')||'0')).toLocaleString();
+document.getElementById('player-name-lb').textContent=localStorage.getItem('nexus_username')||'YOU';
+</script>
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="js/premium.js"></script>
+</body>
+</html>

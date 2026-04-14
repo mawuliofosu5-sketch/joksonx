@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS — The Ultimate Tech Platform by JoksonX</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.hero-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem; max-width:900px; width:100%; }
+.quick-card {
+  background: rgba(0,245,255,0.04); border:1px solid var(--border);
+  border-radius:12px; padding:1rem; text-align:center;
+  cursor:pointer; transition:all 0.3s; text-decoration:none; color:var(--text);
+  animation: float 3s ease-in-out infinite;
+}
+.quick-card:nth-child(2n){animation-delay:0.5s;}
+.quick-card:nth-child(3n){animation-delay:1s;}
+@keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+.quick-card:hover { border-color:var(--cyan); box-shadow:var(--glow-cyan); }
+.quick-card .icon { font-size:2rem; margin-bottom:0.5rem; }
+.quick-card span { font-size:0.8rem; font-family:'Orbitron',monospace; color:var(--cyan); }
+
+.ticker {
+  background: var(--dark2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  padding:0.6rem 0; overflow:hidden; position:relative; z-index:1;
+}
+.ticker-inner {
+  display:flex; gap:3rem; white-space:nowrap;
+  animation: scroll-left 30s linear infinite;
+}
+.ticker-inner span {
+  font-family:'Share Tech Mono',monospace; font-size:0.75rem;
+  color:var(--cyan); letter-spacing:1px;
+}
+.ticker-inner span::before { content:'◆ '; color:var(--magenta); }
+@keyframes scroll-left { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+.trending-tags { display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; max-width:600px; }
+.trend-tag {
+  padding:5px 14px; border:1px solid rgba(0,245,255,0.3);
+  border-radius:20px; font-size:0.75rem;
+  color:rgba(200,230,240,0.7); cursor:pointer;
+  font-family:'Share Tech Mono',monospace;
+  transition:all 0.2s;
+}
+.trend-tag:hover { border-color:var(--cyan); color:var(--cyan); }
+
+#ai-search-result {
+  width:100%; max-width:720px; text-align:left;
+  display:none; animation:slide-in 0.3s ease;
+}
+
+.search-loading { text-align:center; padding:1rem; color:var(--cyan); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="learn.html">Learn</a></li>
+    <li><a href="gaming.html">Gaming</a></li>
+    <li><a href="science.html">Science</a></li>
+    <li><a href="videos.html">Videos</a></li>
+    <li><a href="movies.html">Movies</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li>
+    <li><a href="chat.html">Chat</a></li>
+    <li><a href="earn.html">Earn 💰</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a></li><li><a href="login.html" id="nav-login-btn" style="color:var(--cyan);border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;font-size:0.8rem;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas>
+<div class="cursor"></div><div class="cursor-ring"></div>
+<div class="toast-container"></div>
+
+<!-- TICKER -->
+<div class="ticker" style="margin-top:64px;">
+  <div class="ticker-inner" id="ticker">
+    <span>NEXUS AI POWERED</span><span>LEARN ANYTHING</span><span>50+ GAMES</span>
+    <span>SCIENCE EXPLORER</span><span>MOVIE DATABASE</span><span>EARN REWARDS</span>
+    <span>CHAT GLOBALLY</span><span>CREATED BY JOKSONX</span><span>GRADE 6 STEM</span>
+    <span>NEXUS AI POWERED</span><span>LEARN ANYTHING</span><span>50+ GAMES</span>
+    <span>SCIENCE EXPLORER</span><span>MOVIE DATABASE</span><span>EARN REWARDS</span>
+    <span>CHAT GLOBALLY</span><span>CREATED BY JOKSONX</span><span>GRADE 6 STEM</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🌐 THE FUTURE OF KNOWLEDGE IS HERE</div>
+  <h1 class="glitch" data-text="NEXUS">NEXUS</h1>
+  <p class="hero-sub">Search anything. Learn everything. Play, earn, and connect — powered by AI.</p>
+
+  <div class="search-wrapper">
+    <input class="search-input" id="search-input" placeholder="Ask anything... science, games, movies, math, history..." autocomplete="off"/>
+    <button class="search-btn" id="search-btn">🔍</button>
+  </div>
+
+  <div class="trending-tags">
+    <div class="trend-tag" onclick="quickSearch('quantum physics')">quantum physics</div>
+    <div class="trend-tag" onclick="quickSearch('best games 2025')">best games 2025</div>
+    <div class="trend-tag" onclick="quickSearch('photosynthesis')">photosynthesis</div>
+    <div class="trend-tag" onclick="quickSearch('black holes')">black holes</div>
+    <div class="trend-tag" onclick="quickSearch('machine learning')">machine learning</div>
+    <div class="trend-tag" onclick="quickSearch('periodic table')">periodic table</div>
+    <div class="trend-tag" onclick="quickSearch('space exploration')">space exploration</div>
+    <div class="trend-tag" onclick="quickSearch('DNA replication')">DNA replication</div>
+  </div>
+
+  <!-- AI SEARCH RESULT -->
+  <div id="ai-search-result">
+    <div class="ai-answer" id="ai-answer-box">
+      <div id="ai-answer-text"></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div style="position:relative;z-index:1;padding:0 2rem 2rem;">
+  <div class="stats-grid reveal" style="max-width:900px;margin:0 auto;">
+    <div class="stat-box">
+      <div class="stat-num" data-count="50">0</div>
+      <div class="stat-label">GAMES</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" data-count="1000">0</div>
+      <div class="stat-label">LESSONS</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" data-count="500">0</div>
+      <div class="stat-label">MOVIES</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" data-count="10000">0</div>
+      <div class="stat-label">USERS</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK ACCESS -->
+<section class="section reveal">
+  <div class="section-title">🚀 EXPLORE NEXUS</div>
+  <p class="section-sub">Your gateway to knowledge, gaming, and more</p>
+  <div class="hero-grid" style="margin:0 auto;">
+    <a href="learn.html" class="quick-card"><div class="icon">📚</div><span>LEARN</span></a>
+    <a href="gaming.html" class="quick-card"><div class="icon">🎮</div><span>GAMING</span></a>
+    <a href="science.html" class="quick-card"><div class="icon">🔬</div><span>SCIENCE</span></a>
+    <a href="videos.html" class="quick-card"><div class="icon">▶️</div><span>VIDEOS</span></a>
+    <a href="movies.html" class="quick-card"><div class="icon">🎬</div><span>MOVIES</span></a>
+    <a href="ai-tools.html" class="quick-card"><div class="icon">🤖</div><span>AI TOOLS</span></a>
+    <a href="chat.html" class="quick-card"><div class="icon">💬</div><span>CHAT</span></a>
+    <a href="earn.html" class="quick-card"><div class="icon">💰</div><span>EARN</span></a>
+    <a href="about.html" class="quick-card"><div class="icon">⚡</div><span>ABOUT</span></a>
+    <a href="news.html" class="quick-card"><div class="icon">📰</div><span>NEWS</span></a>
+    <a href="math.html" class="quick-card"><div class="icon">🧮</div><span>MATH</span></a>
+    <a href="music.html" class="quick-card"><div class="icon">🎵</div><span>MUSIC</span></a>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section reveal">
+  <div class="section-title">✨ WHY NEXUS?</div>
+  <p class="section-sub">Built for the next generation of digital explorers</p>
+  <div class="grid">
+    <div class="feat-card">
+      <span class="feat-icon">🧠</span>
+      <div class="feat-title">AI-POWERED SEARCH</div>
+      <div class="feat-desc">Ask any question and get instant AI answers. No more searching through pages.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🎓</span>
+      <div class="feat-title">INTERACTIVE LEARNING</div>
+      <div class="feat-desc">Learn science, math, history, and more with engaging lessons and quizzes.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🕹️</span>
+      <div class="feat-title">EPIC GAMES</div>
+      <div class="feat-desc">50+ embedded games from action to puzzles. Challenge yourself daily.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">💎</span>
+      <div class="feat-title">EARN REWARDS</div>
+      <div class="feat-desc">Watch ads, earn coins. Withdraw real money when you hit $100.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🌐</span>
+      <div class="feat-title">GLOBAL CHAT</div>
+      <div class="feat-desc">Connect with friends via phone, Facebook, WhatsApp and more.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🔭</span>
+      <div class="feat-title">SCIENCE HUB</div>
+      <div class="feat-desc">Explore the scientific method, experiments, biology, chemistry and physics.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🎰</span>
+      <div class="feat-title">SPIN & WIN</div>
+      <div class="feat-desc">Spin the wheel every 4 hours to win real money prizes added to your wallet.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">👥</span>
+      <div class="feat-title">REFERRAL SYSTEM</div>
+      <div class="feat-desc">Invite friends and earn $2.00 for every person who joins NEXUS using your code.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">✅</span>
+      <div class="feat-title">DAILY TASKS</div>
+      <div class="feat-desc">Complete daily missions to earn bonus coins — watch ads, play games, explore pages.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">📰</span>
+      <div class="feat-title">LIVE NEWS</div>
+      <div class="feat-desc">Stay up to date with AI-curated tech, science, and world news in real-time.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🎵</span>
+      <div class="feat-title">MUSIC PLAYER</div>
+      <div class="feat-desc">Stream your favorite music, explore new tracks, and get AI-powered song recommendations.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🧮</span>
+      <div class="feat-title">MATH TOOLS</div>
+      <div class="feat-desc">Advanced calculator, equation solver, and AI math tutor for any topic.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">📱</span>
+      <div class="feat-title">SOCIAL CONNECT</div>
+      <div class="feat-desc">Link WhatsApp, Facebook, Telegram, TikTok, Snapchat and more — all in one place.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🔗</span>
+      <div class="feat-title">DEEP LINKS</div>
+      <div class="feat-desc">One-click access to WhatsApp, Facebook, Instagram, YouTube and every social platform.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🏆</span>
+      <div class="feat-title">LEADERBOARDS</div>
+      <div class="feat-desc">Compete on global leaderboards for gaming, earning, and learning achievements.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🌐</span>
+      <div class="feat-title">70+ GAMES</div>
+      <div class="feat-desc">From built-in canvas games to top browser hits like Krunker, Slope, and Temple Run.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🎬</span>
+      <div class="feat-title">MOVIE STREAMING</div>
+      <div class="feat-desc">Browse movies and get direct links to Netflix, Prime Video, and YouTube for each film.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">📊</span>
+      <div class="feat-title">WALLET TRACKER</div>
+      <div class="feat-desc">Track your NEXUS earnings in real-time — see ad revenue, miner income, and bonuses.</div>
+    </div>
+    <div class="feat-card">
+      <span class="feat-icon">🧠</span>
+      <div class="feat-title">AI TUTOR</div>
+      <div class="feat-desc">Get instant AI explanations for science, math, history, coding — any subject you need.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WALLET WIDGET -->
+<section class="section reveal">
+  <div class="section-title">💰 YOUR NEXUS WALLET</div>
+  <p class="section-sub">Track your earnings from ads, mining machines, tasks and referrals</p>
+  <div style="max-width:700px;margin:0 auto;background:linear-gradient(135deg,rgba(0,245,255,0.06),rgba(255,215,0,0.04));border:2px solid rgba(0,245,255,0.4);border-radius:24px;padding:2rem;text-align:center;box-shadow:0 0 40px rgba(0,245,255,0.1);">
+    <div style="font-size:0.75rem;color:rgba(200,230,240,0.5);letter-spacing:2px;font-family:'Share Tech Mono',monospace;">NEXUS WALLET</div>
+    <div style="font-family:'Orbitron',monospace;font-size:3rem;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(255,215,0,0.4);">$<span id="home-wallet">0.0000</span></div>
+    <div style="margin:1rem 0;">
+      <div style="background:rgba(0,245,255,0.1);border-radius:8px;height:10px;overflow:hidden;max-width:400px;margin:0 auto;">
+        <div id="home-progress" style="height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold));border-radius:8px;transition:width 0.5s;width:0%;"></div>
+      </div>
+      <div style="font-size:0.72rem;color:rgba(200,230,240,0.5);margin-top:0.4rem;">Progress to $100 withdrawal</div>
+    </div>
+    <a href="earn.html" class="btn btn-gold" style="font-size:0.9rem;padding:12px 36px;display:inline-block;text-decoration:none;">💰 EARN MORE →</a>
+  </div>
+</section>
+
+<!-- QUICK SOCIAL LINKS -->
+<section class="section reveal">
+  <div class="section-title">📱 SOCIAL QUICK LINKS</div>
+  <p class="section-sub">Access any platform instantly</p>
+  <div style="display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;max-width:800px;margin:0 auto;">
+    <a href="https://wa.me/" target="_blank" class="quick-card" style="background:rgba(37,211,102,0.08);border-color:rgba(37,211,102,0.4);text-decoration:none;min-width:100px;"><div class="icon">💬</div><span style="color:#25d366;">WHATSAPP</span></a>
+    <a href="https://www.facebook.com" target="_blank" class="quick-card" style="background:rgba(24,119,242,0.08);border-color:rgba(24,119,242,0.4);text-decoration:none;min-width:100px;"><div class="icon">👤</div><span style="color:#1877f2;">FACEBOOK</span></a>
+    <a href="https://www.instagram.com" target="_blank" class="quick-card" style="background:rgba(225,48,108,0.08);border-color:rgba(225,48,108,0.4);text-decoration:none;min-width:100px;"><div class="icon">📸</div><span style="color:#e1306c;">INSTAGRAM</span></a>
+    <a href="https://www.tiktok.com" target="_blank" class="quick-card" style="background:rgba(254,44,85,0.08);border-color:rgba(254,44,85,0.4);text-decoration:none;min-width:100px;"><div class="icon">🎵</div><span style="color:#fe2c55;">TIKTOK</span></a>
+    <a href="https://www.youtube.com" target="_blank" class="quick-card" style="background:rgba(255,0,0,0.08);border-color:rgba(255,0,0,0.4);text-decoration:none;min-width:100px;"><div class="icon">▶️</div><span style="color:#ff0000;">YOUTUBE</span></a>
+    <a href="https://twitter.com" target="_blank" class="quick-card" style="background:rgba(29,155,240,0.08);border-color:rgba(29,155,240,0.4);text-decoration:none;min-width:100px;"><div class="icon">🐦</div><span style="color:#1d9bf0;">TWITTER/X</span></a>
+    <a href="https://t.me/" target="_blank" class="quick-card" style="background:rgba(38,166,209,0.08);border-color:rgba(38,166,209,0.4);text-decoration:none;min-width:100px;"><div class="icon">✈️</div><span style="color:#26a5e4;">TELEGRAM</span></a>
+    <a href="https://discord.com" target="_blank" class="quick-card" style="background:rgba(88,101,242,0.08);border-color:rgba(88,101,242,0.4);text-decoration:none;min-width:100px;"><div class="icon">🎮</div><span style="color:#5865f2;">DISCORD</span></a>
+    <a href="https://snapchat.com" target="_blank" class="quick-card" style="background:rgba(255,252,0,0.08);border-color:rgba(255,252,0,0.4);text-decoration:none;min-width:100px;"><div class="icon">👻</div><span style="color:#fffc00;">SNAPCHAT</span></a>
+    <a href="https://www.netflix.com" target="_blank" class="quick-card" style="background:rgba(229,9,20,0.08);border-color:rgba(229,9,20,0.4);text-decoration:none;min-width:100px;"><div class="icon">🎬</div><span style="color:#e50914;">NETFLIX</span></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h4>NEXUS</h4>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a></li>
+    <li><a href="subscribe.html" style="color:var(--gold);">⭐ Subscribe</a></li><li><a href="premium.html" style="color:var(--gold);border-color:var(--gold);">⭐ PREMIUM</a>
+      <a href="learn.html">Learn</a>
+      <a href="gaming.html">Gaming</a>
+    </div>
+    <div class="footer-col">
+      <h4>EXPLORE</h4>
+      <a href="science.html">Science</a>
+      <a href="videos.html">Videos</a>
+      <a href="movies.html">Movies</a>
+      <a href="ai-tools.html">AI Tools</a>
+    </div>
+    <div class="footer-col">
+      <h4>COMMUNITY</h4>
+      <a href="chat.html">Chat</a>
+      <a href="earn.html">Earn Money</a>
+      <a href="news.html">Tech News</a>
+      <a href="music.html">Music</a>
+    </div>
+    <div class="footer-col">
+      <h4>CREATOR</h4>
+      <p style="font-size:0.85rem;color:rgba(200,230,240,0.6);line-height:1.8;">
+        ⚡ JoksonX<br>
+        One STEM 6<br>
+        Building the future,<br>one line at a time.
+      </p>
+    </div>
+  </div>
+  <div class="neon-line"></div>
+  <div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6 | AGE 15 | ALL RIGHTS RESERVED</div>
+</footer>
+
+
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+// SEARCH ENGINE
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+const resultBox = document.getElementById('ai-search-result');
+const answerText = document.getElementById('ai-answer-text');
+
+async function doSearch(query) {
+  if (!query.trim()) return;
+  resultBox.style.display = 'block';
+  answerText.innerHTML = '<span class="spinner"></span> NEXUS AI is searching...';
+  window.scrollTo({top: document.querySelector('.hero').offsetTop + 300, behavior:'smooth'});
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:'You are NEXUS AI, an intelligent search engine assistant. Answer questions clearly, accurately and engagingly. Use emojis to make responses fun. Format with short paragraphs. Creator: JoksonX.',
+        messages:[{role:'user', content: query}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'No response found.';
+    answerText.innerHTML = text.replace(/\n/g,'<br>');
+  } catch(e) {
+    answerText.innerHTML = '⚠️ Network error. Please check your connection.';
+  }
+}
+
+searchBtn.addEventListener('click', () => doSearch(searchInput.value));
+searchInput.addEventListener('keydown', e => { if(e.key==='Enter') doSearch(searchInput.value); });
+
+function quickSearch(q) {
+  searchInput.value = q;
+  doSearch(q);
+}
+
+// Wallet widget update
+function updateHomeWallet(){
+  const bal = parseFloat(localStorage.getItem('nexus_wallet')||'0');
+  const el = document.getElementById('home-wallet');
+  const prog = document.getElementById('home-progress');
+  if(el) el.textContent = bal.toFixed(4);
+  if(prog) prog.style.width = Math.min(100,(bal/100)*100)+'%';
+}
+updateHomeWallet();
+setInterval(updateHomeWallet, 5000);
+
+// Counter animation
+document.querySelectorAll('[data-count]').forEach(el => {
+  const obs = new IntersectionObserver(entries => {
+    if(entries[0].isIntersecting) {
+      animateCounter(el, parseInt(el.dataset.count));
+      obs.disconnect();
+    }
+  });
+  obs.observe(el);
+});
+</script>
+
+<!-- NEXUS AD SCRIPTS -->
+<script>atOptions={'key':'4af2eb3b893465fbeaa31d712606e545','format':'iframe','height':600,'width':160,'params':{}};</script>
+<script src="https://www.highperformanceformat.com/4af2eb3b893465fbeaa31d712606e545/invoke.js"></script>
+<script src="https://pl29119943.profitablecpmratenetwork.com/95/36/71/953671a9b1c1310473849544757c959e.js"></script>
+<script src="https://pl29119946.profitablecpmratenetwork.com/4e/c2/c8/4ec2c859136af96e53357bc9a21d1063.js"></script>
+<script async data-cfasync="false" src="https://pl29072711.profitablecpmratenetwork.com/fe2c19526de3ee03ac6f5077ca63cdaa/invoke.js"></script>
+
+<script src="js/premium.js"></script>
+</body>
+</html>

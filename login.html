@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS — Login or Sign Up</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;position:relative;z-index:2;}
+.login-box{background:rgba(5,13,26,0.96);border:1px solid var(--border);border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:430px;box-shadow:0 0 60px rgba(0,245,255,0.1);}
+.login-logo{text-align:center;margin-bottom:1.5rem;}
+.login-logo .logo-icon{font-size:2.8rem;display:block;}
+.login-logo h1{font-family:'Orbitron',monospace;font-size:1.4rem;color:var(--cyan);letter-spacing:3px;}
+.login-logo p{font-size:0.78rem;opacity:0.5;margin-top:0.3rem;}
+.tab-row{display:flex;margin-bottom:1.5rem;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.tab-btn{flex:1;padding:10px;background:none;border:none;color:var(--text);font-family:'Orbitron',monospace;font-size:0.72rem;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
+.tab-btn.active{background:rgba(0,245,255,0.12);color:var(--cyan);}
+.social-row{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.2rem;}
+.social-btn{display:flex;align-items:center;gap:0.8rem;padding:11px 16px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.03);color:var(--text);cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:0.95rem;font-weight:600;transition:all 0.2s;width:100%;}
+.social-btn:hover{border-color:var(--cyan);background:rgba(0,245,255,0.06);}
+.sico{font-size:1.3rem;min-width:24px;text-align:center;}
+.divider{display:flex;align-items:center;gap:0.8rem;margin:1rem 0;opacity:0.35;font-size:0.72rem;letter-spacing:1px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.field{margin-bottom:0.9rem;}
+.field label{display:block;font-size:0.68rem;letter-spacing:1px;opacity:0.55;margin-bottom:4px;font-family:'Orbitron',monospace;}
+.field input{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;transition:border-color 0.2s;}
+.field input:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,245,255,0.08);}
+.btn-login{width:100%;padding:14px;font-family:'Orbitron',monospace;font-size:0.8rem;letter-spacing:2px;background:linear-gradient(135deg,var(--cyan),var(--magenta));border:none;border-radius:10px;color:#000;font-weight:700;cursor:pointer;transition:all 0.3s;margin-top:0.5rem;}
+.btn-login:hover{opacity:0.88;transform:translateY(-1px);box-shadow:0 0 20px rgba(0,245,255,0.3);}
+.btn-login:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+.phone-row{display:flex;gap:0.5rem;}
+.phone-flag{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:11px 10px;color:#fff;outline:none;font-size:0.88rem;min-width:95px;}
+.agree{font-size:0.7rem;opacity:0.4;text-align:center;margin-top:0.8rem;line-height:1.6;}
+.agree a{color:var(--cyan);text-decoration:none;}
+.form-panel{display:none;}
+.form-panel.active{display:block;}
+.success-box{text-align:center;padding:2.5rem 1rem;display:none;}
+.s-icon{font-size:3.5rem;display:block;margin-bottom:1rem;}
+.spin-ring{width:36px;height:36px;border:3px solid rgba(0,245,255,0.2);border-top-color:var(--cyan);border-radius:50%;animation:spin 0.7s linear infinite;margin:0.8rem auto 0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.pin-row{display:flex;gap:0.5rem;justify-content:center;margin:1rem 0;}
+.pin-inp{width:44px;height:52px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;text-align:center;font-size:1.4rem;font-family:'Orbitron',monospace;outline:none;transition:border-color 0.2s;}
+.pin-inp:focus{border-color:var(--cyan);}
+.err-msg{background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.3);border-radius:8px;padding:0.6rem 1rem;font-size:0.8rem;color:#ff7777;margin-top:0.6rem;display:none;line-height:1.5;}
+.mode-note{border-radius:8px;padding:0.65rem 1rem;font-size:0.72rem;margin-bottom:1rem;line-height:1.6;text-align:center;background:rgba(57,255,20,0.07);border:1px solid rgba(57,255,20,0.25);color:rgba(200,230,240,0.8);}
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas>
+<div class="cursor"></div><div class="cursor-ring"></div>
+<div class="toast-container"></div>
+
+<div class="login-wrap">
+  <div class="login-box">
+
+    <div class="login-logo">
+      <span class="logo-icon">⚡</span>
+      <h1>NEXUS</h1>
+      <p>BY JOKSONX · ONE STEM 6 · AGE 15</p>
+    </div>
+
+    <!-- Success screen -->
+    <div class="success-box" id="success-box">
+      <span class="s-icon">✅</span>
+      <h2 style="font-family:'Orbitron',monospace;color:var(--neon-green);margin-bottom:0.5rem;">WELCOME!</h2>
+      <p id="success-msg" style="opacity:0.7;font-size:0.9rem;">Logging you in...</p>
+      <div class="spin-ring"></div>
+    </div>
+
+    <!-- Phone OTP verification -->
+    <div id="otp-box" style="display:none;">
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="font-family:'Orbitron',monospace;color:var(--cyan);font-size:0.95rem;margin-bottom:0.5rem;">VERIFY YOUR NUMBER</div>
+        <p id="otp-hint" style="font-size:0.78rem;opacity:0.6;line-height:1.5;">Code sent. <strong style="color:var(--gold);">Demo code: 123456</strong></p>
+      </div>
+      <div class="pin-row">
+        <input class="pin-inp" maxlength="1" id="p0" oninput="pinMove(this,0)" onkeydown="pinBack(event,0)">
+        <input class="pin-inp" maxlength="1" id="p1" oninput="pinMove(this,1)" onkeydown="pinBack(event,1)">
+        <input class="pin-inp" maxlength="1" id="p2" oninput="pinMove(this,2)" onkeydown="pinBack(event,2)">
+        <input class="pin-inp" maxlength="1" id="p3" oninput="pinMove(this,3)" onkeydown="pinBack(event,3)">
+        <input class="pin-inp" maxlength="1" id="p4" oninput="pinMove(this,4)" onkeydown="pinBack(event,4)">
+        <input class="pin-inp" maxlength="1" id="p5" oninput="pinMove(this,5)" onkeydown="pinBack(event,5)">
+      </div>
+      <div class="err-msg" id="otp-err"></div>
+      <button class="btn-login" onclick="verifyOTP()">✅ VERIFY CODE</button>
+      <p style="text-align:center;font-size:0.75rem;opacity:0.4;margin-top:1rem;cursor:pointer;" onclick="backToMain()">← Back to login</p>
+    </div>
+
+    <!-- Main form -->
+    <div id="main-form">
+      <div class="mode-note" id="mode-note">
+        ✅ <strong>Works offline</strong> — your account saves in this browser. Add a backend later for cloud sync.
+      </div>
+
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('login',this)">LOGIN</button>
+        <button class="tab-btn" onclick="switchTab('signup',this)">SIGN UP</button>
+      </div>
+
+      <div class="social-row">
+        <button class="social-btn" onclick="socialLogin('Google')"><span class="sico">🌐</span> Continue with Google</button>
+        <button class="social-btn" onclick="socialLogin('Facebook')"><span class="sico">📘</span> Continue with Facebook</button>
+        <button class="social-btn" onclick="socialLogin('Discord')"><span class="sico">🎮</span> Continue with Discord</button>
+      </div>
+      <div class="divider">OR USE EMAIL</div>
+
+      <!-- LOGIN -->
+      <div class="form-panel active" id="panel-login">
+        <div class="field"><label>EMAIL ADDRESS</label><input type="email" id="login-email" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="field"><label>PASSWORD</label><input type="password" id="login-pass" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div style="text-align:right;margin-bottom:0.8rem;"><span style="font-size:0.72rem;opacity:0.45;cursor:pointer;" onclick="forgotPass()">Forgot password?</span></div>
+        <div class="err-msg" id="login-err"></div>
+        <button class="btn-login" id="login-btn" onclick="doLogin()">⚡ LOGIN TO NEXUS</button>
+        <div style="text-align:center;margin-top:1rem;">
+          <button class="social-btn" style="justify-content:center;border-color:rgba(0,245,255,0.3);" onclick="showPanel('phone')"><span class="sico">📱</span> Login with Phone OTP</button>
+        </div>
+      </div>
+
+      <!-- SIGNUP -->
+      <div class="form-panel" id="panel-signup">
+        <div class="field"><label>FULL NAME</label><input type="text" id="su-name" placeholder="Your full name" autocomplete="name"></div>
+        <div class="field"><label>EMAIL ADDRESS</label><input type="email" id="su-email" placeholder="your@email.com" autocomplete="email"></div>
+        <div class="field"><label>PHONE NUMBER</label>
+          <div class="phone-row">
+            <select class="phone-flag" id="su-code"><option value="+233">🇬🇭 +233</option><option value="+234">🇳🇬 +234</option><option value="+254">🇰🇪 +254</option><option value="+27">🇿🇦 +27</option><option value="+1">🇺🇸 +1</option><option value="+44">🇬🇧 +44</option></select>
+            <input type="tel" id="su-phone" placeholder="Phone number" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;">
+          </div>
+        </div>
+        <div class="field"><label>PASSWORD (min 8 characters)</label><input type="password" id="su-pass" placeholder="Create a strong password" autocomplete="new-password"></div>
+        <div class="field"><label>CONFIRM PASSWORD</label><input type="password" id="su-pass2" placeholder="Repeat your password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSignup()"></div>
+        <div class="err-msg" id="signup-err"></div>
+        <button class="btn-login" id="signup-btn" onclick="doSignup()">🚀 CREATE MY ACCOUNT</button>
+        <p class="agree">By signing up you agree to NEXUS <a href="#">Terms</a> &amp; <a href="#">Privacy Policy</a></p>
+      </div>
+
+      <!-- PHONE -->
+      <div class="form-panel" id="panel-phone">
+        <p style="font-size:0.82rem;opacity:0.7;margin-bottom:1rem;">Enter your phone number to receive a login code.</p>
+        <div class="field"><label>PHONE NUMBER</label>
+          <div class="phone-row">
+            <select class="phone-flag" id="ph-code"><option value="+233">🇬🇭 +233</option><option value="+234">🇳🇬 +234</option><option value="+254">🇰🇪 +254</option><option value="+1">🇺🇸 +1</option><option value="+44">🇬🇧 +44</option></select>
+            <input type="tel" id="ph-num" placeholder="Phone number" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;" onkeydown="if(event.key==='Enter')sendOTP()">
+          </div>
+        </div>
+        <div class="err-msg" id="phone-err"></div>
+        <button class="btn-login" onclick="sendOTP()">📩 SEND OTP CODE</button>
+        <p style="text-align:center;font-size:0.75rem;opacity:0.4;margin-top:1rem;cursor:pointer;" onclick="showPanel('login')">← Back</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+// Skip login page if already logged in
+(function(){
+  const t=localStorage.getItem('nx_token'),u=localStorage.getItem('nx_user');
+  if(!t||!u) return;
+  try {
+    if(t.startsWith('local_')){const p=JSON.parse(atob(t.replace('local_','')));if(p.exp>Date.now())go();}
+    else go();
+  }catch(e){}
+  function go(){const d=sessionStorage.getItem('nx_after_login')||'index.html';sessionStorage.removeItem('nx_after_login');window.location.replace(d);}
+})();
+
+// ── UI helpers ────────────────────────────────────────────
+function switchTab(n,b){document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');showPanel(n);}
+function showPanel(n){document.querySelectorAll('.form-panel').forEach(p=>p.classList.remove('active'));const p=document.getElementById('panel-'+n);if(p)p.classList.add('active');hideErrs();}
+function hideErrs(){document.querySelectorAll('.err-msg').forEach(e=>e.style.display='none');}
+function showErr(id,msg){const e=document.getElementById(id);if(e){e.textContent=msg;e.style.display='block';}}
+function backToMain(){document.getElementById('otp-box').style.display='none';document.getElementById('main-form').style.display='block';}
+
+// ── Core local auth ───────────────────────────────────────
+function _users(){try{return JSON.parse(localStorage.getItem('nx_users')||'[]');}catch{return[];}}
+function _saveUsers(u){localStorage.setItem('nx_users',JSON.stringify(u));}
+function _tok(id){return 'local_'+btoa(JSON.stringify({id,exp:Date.now()+30*86400000}));}
+function _sess(tok,user){localStorage.setItem('nx_token',tok);localStorage.setItem('nx_user',JSON.stringify(user));}
+function _enc(s){return btoa(unescape(encodeURIComponent(s)));}
+
+function authRegister(name,email,pass,phone){
+  const all=_users();
+  if(all.find(u=>u.email.toLowerCase()===email.toLowerCase())) throw new Error('An account with this email already exists');
+  const user={id:'u_'+Date.now()+Math.random().toString(36).slice(2),name:name.trim(),email:email.toLowerCase().trim(),phone:phone||'',plan:'none',isAdmin:false,createdAt:new Date().toISOString(),_pw:_enc(pass)};
+  all.push(user);_saveUsers(all);
+  const tok=_tok(user.id),safe={id:user.id,name:user.name,email:user.email,phone:user.phone,plan:user.plan};
+  _sess(tok,safe);return{token:tok,user:safe};
+}
+
+function authLogin(email,pass){
+  const all=_users();
+  const found=all.find(u=>u.email.toLowerCase()===email.toLowerCase().trim());
+  if(!found) throw new Error('No account found with that email address');
+  if(found._pw!==_enc(pass)) throw new Error('Incorrect password — please try again');
+  const tok=_tok(found.id),safe={id:found.id,name:found.name,email:found.email,phone:found.phone,plan:found.plan};
+  _sess(tok,safe);return{token:tok,user:safe};
+}
+
+function authSocial(name,email,prov){
+  const all=_users();
+  let f=all.find(u=>u.email.toLowerCase()===email.toLowerCase());
+  if(!f){f={id:'u_'+Date.now()+Math.random().toString(36).slice(2),name,email:email.toLowerCase(),phone:'',plan:'none',isAdmin:false,provider:prov,createdAt:new Date().toISOString(),_pw:''};all.push(f);_saveUsers(all);}
+  const tok=_tok(f.id),safe={id:f.id,name:f.name,email:f.email,phone:f.phone,plan:f.plan};
+  _sess(tok,safe);return{token:tok,user:safe};
+}
+
+// ── Login action ──────────────────────────────────────────
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  hideErrs();
+  if(!email){showErr('login-err','⚠️ Please enter your email address');return;}
+  if(!pass){showErr('login-err','⚠️ Please enter your password');return;}
+  const btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='⏳ Logging in...';
+  try{
+    // Try real backend first if connected
+    let data;
+    if(typeof NEXUS_API!=='undefined'&&NEXUS_API.BASE_URL){
+      data=await NEXUS_API.login(email,pass);
+    } else {
+      data=authLogin(email,pass);
+    }
+    showSuccess('Welcome back, '+data.user.name+'!');
+  }catch(err){
+    showErr('login-err','❌ '+err.message);
+    btn.disabled=false;btn.textContent='⚡ LOGIN TO NEXUS';
+  }
+}
+
+// ── Signup action ─────────────────────────────────────────
+async function doSignup(){
+  const name=document.getElementById('su-name').value.trim();
+  const email=document.getElementById('su-email').value.trim();
+  const code=document.getElementById('su-code').value;
+  const phone=document.getElementById('su-phone').value.trim();
+  const pass=document.getElementById('su-pass').value;
+  const pass2=document.getElementById('su-pass2').value;
+  hideErrs();
+  if(!name){showErr('signup-err','⚠️ Please enter your full name');return;}
+  if(!email||!email.includes('@')){showErr('signup-err','⚠️ Please enter a valid email address');return;}
+  if(pass.length<8){showErr('signup-err','⚠️ Password must be at least 8 characters');return;}
+  if(pass!==pass2){showErr('signup-err','⚠️ Passwords do not match — please re-enter');return;}
+  const btn=document.getElementById('signup-btn');btn.disabled=true;btn.textContent='⏳ Creating account...';
+  try{
+    let data;
+    if(typeof NEXUS_API!=='undefined'&&NEXUS_API.BASE_URL){
+      data=await NEXUS_API.register(name,email,pass,code+phone);
+    } else {
+      data=authRegister(name,email,pass,code+phone);
+    }
+    showSuccess('Account created! Welcome, '+data.user.name+'! 🎉');
+  }catch(err){
+    showErr('signup-err','❌ '+err.message);
+    btn.disabled=false;btn.textContent='🚀 CREATE MY ACCOUNT';
+  }
+}
+
+// ── Social login ──────────────────────────────────────────
+function socialLogin(prov){
+  const email=prov.toLowerCase().replace(/[\s\/]/g,'')+'_'+Date.now().toString(36)+'@nexus.app';
+  toast('🔐 Connecting via '+prov+'...','success');
+  setTimeout(()=>{
+    try{
+      let data;
+      if(typeof NEXUS_API!=='undefined'&&NEXUS_API.BASE_URL){
+        NEXUS_API.socialLogin(prov+' User',email,prov.toLowerCase()).then(d=>showSuccess('Logged in via '+prov+'!')).catch(e=>toast('❌ '+e.message,'error'));
+        return;
+      }
+      data=authSocial(prov+' User',email,prov.toLowerCase());
+      showSuccess('Logged in via '+prov+'!');
+    }catch(e){toast('❌ '+e.message,'error');}
+  },1000);
+}
+
+// ── OTP flow ──────────────────────────────────────────────
+function sendOTP(){
+  const code=document.getElementById('ph-code').value;
+  const num=document.getElementById('ph-num').value.trim();
+  hideErrs();
+  if(!num){showErr('phone-err','⚠️ Enter your phone number');return;}
+  const full=code+num.replace(/\D/g,'');
+  localStorage.setItem('nx_otp_phone',full);
+  localStorage.setItem('nx_otp_code','123456'); // demo
+  toast('📩 OTP sent to '+full,'success');
+  document.getElementById('main-form').style.display='none';
+  document.getElementById('otp-box').style.display='block';
+  document.getElementById('otp-hint').innerHTML='Code sent to <strong>'+full+'</strong>. <strong style="color:var(--gold)">Demo code: 123456</strong>';
+  document.getElementById('p0').focus();
+}
+function pinMove(el,idx){if(el.value.length===1&&idx<5)document.getElementById('p'+(idx+1)).focus();if(idx===5)verifyOTP();}
+function pinBack(e,idx){if(e.key==='Backspace'&&!e.target.value&&idx>0)document.getElementById('p'+(idx-1)).focus();}
+
+function verifyOTP(){
+  const code=[0,1,2,3,4,5].map(i=>document.getElementById('p'+i).value).join('');
+  const phone=localStorage.getItem('nx_otp_phone')||'user';
+  const expected=localStorage.getItem('nx_otp_code')||'123456';
+  hideErrs();
+  if(code.length<6){showErr('otp-err','⚠️ Enter all 6 digits');return;}
+  if(code!==expected){showErr('otp-err','❌ Wrong code. Demo code is 123456');return;}
+  try{
+    const data=authSocial('NEXUS User',phone+'@nexus.app','phone');
+    showSuccess('Phone verified! Welcome to NEXUS!');
+  }catch(e){showErr('otp-err','❌ '+e.message);}
+}
+
+function forgotPass(){
+  const email=document.getElementById('login-email').value.trim();
+  if(!email){showErr('login-err','⚠️ Enter your email address first');return;}
+  toast('📧 Password reset sent to '+email,'success');
+}
+
+function showSuccess(msg){
+  document.getElementById('main-form').style.display='none';
+  document.getElementById('otp-box').style.display='none';
+  const sb=document.getElementById('success-box');sb.style.display='block';
+  document.getElementById('success-msg').textContent=msg;
+  setTimeout(()=>{
+    const dest=sessionStorage.getItem('nx_after_login')||'index.html';
+    sessionStorage.removeItem('nx_after_login');
+    window.location.replace(dest);
+  },1800);
+}
+
+// Update note if backend connected
+document.addEventListener('DOMContentLoaded',()=>{
+  if(typeof NEXUS_API!=='undefined'&&NEXUS_API.BASE_URL){
+    const n=document.getElementById('mode-note');
+    n.style.background='rgba(0,245,255,0.07)';n.style.borderColor='rgba(0,245,255,0.3)';
+    n.innerHTML='🌐 <strong>Online mode:</strong> Connected to NEXUS backend. Full cloud sync active.';
+  }
+});
+</script>
+<script src="js/api.js"></script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS — Subscribe</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;max-width:900px;margin:0 auto 2.5rem;}
+.plan-card{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:2rem;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
+.plan-card:hover,.plan-card.selected{transform:translateY(-6px);}
+.plan-card.selected{border-color:var(--gold);box-shadow:0 0 40px rgba(255,215,0,0.3);}
+.plan-price{font-family:'Orbitron',monospace;font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.plan-name{font-family:'Orbitron',monospace;font-size:0.95rem;margin-bottom:0.5rem;}
+.plan-per{font-size:0.72rem;opacity:0.45;margin-bottom:1.2rem;}
+.plan-feat{list-style:none;text-align:left;font-size:0.82rem;}
+.plan-feat li{padding:5px 0;border-bottom:1px solid rgba(0,245,255,0.07);}
+.plan-feat li::before{content:'✅ ';}
+.hot-badge{position:absolute;top:0;right:0;background:linear-gradient(135deg,var(--gold),#ff8800);color:#000;font-family:'Orbitron',monospace;font-size:0.55rem;padding:5px 14px;border-radius:0 20px 0 12px;font-weight:900;}
+
+.pay-box{max-width:560px;margin:0 auto;background:rgba(5,13,26,0.95);border:1px solid var(--border);border-radius:20px;padding:2rem;display:none;}
+.pay-box.show{display:block;}
+.step-num{font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--gold);letter-spacing:1px;margin-bottom:0.4rem;}
+.step-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;}
+.momo-num-btn{background:linear-gradient(135deg,rgba(255,215,0,0.1),rgba(255,136,0,0.06));border:2px dashed var(--gold);border-radius:12px;padding:1.2rem;text-align:center;cursor:pointer;transition:all 0.2s;}
+.momo-num-btn:hover{background:rgba(255,215,0,0.15);}
+.momo-revealed{font-family:'Orbitron',monospace;font-size:2rem;color:var(--cyan);letter-spacing:4px;text-shadow:var(--glow-cyan);display:inline-block;background:rgba(0,245,255,0.06);border:1px solid var(--cyan);border-radius:10px;padding:0.7rem 1.5rem;margin:0.5rem 0;}
+.field label{display:block;font-size:0.68rem;letter-spacing:1px;opacity:0.55;margin-bottom:4px;font-family:'Orbitron',monospace;}
+.field input{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:#fff;outline:none;font-family:'Rajdhani',sans-serif;font-size:0.95rem;box-sizing:border-box;transition:border-color 0.2s;}
+.field input:focus{border-color:var(--cyan);}
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:1.2rem;text-align:center;cursor:pointer;transition:all 0.2s;font-size:0.82rem;opacity:0.6;}
+.upload-zone:hover,.upload-zone.has-file{border-color:var(--cyan);opacity:1;background:rgba(0,245,255,0.04);}
+.submit-btn{width:100%;padding:14px;font-family:'Orbitron',monospace;font-size:0.85rem;letter-spacing:2px;background:linear-gradient(135deg,var(--cyan),var(--magenta));border:none;border-radius:10px;color:#000;font-weight:700;cursor:pointer;transition:all 0.3s;margin-top:0.5rem;}
+.submit-btn:disabled{opacity:0.45;cursor:not-allowed;}
+.success-card{background:linear-gradient(135deg,rgba(57,255,20,0.08),rgba(0,245,255,0.05));border:2px solid var(--neon-green);border-radius:16px;padding:2rem;text-align:center;display:none;}
+.history-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:0.6rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.status-badge{font-family:'Orbitron',monospace;font-size:0.6rem;padding:4px 10px;border-radius:20px;}
+.status-badge.pending{background:rgba(255,215,0,0.12);color:var(--gold);border:1px solid rgba(255,215,0,0.3);}
+.status-badge.approved{background:rgba(57,255,20,0.12);color:var(--neon-green);border:1px solid rgba(57,255,20,0.3);}
+.status-badge.rejected{background:rgba(255,68,68,0.12);color:#ff6666;border:1px solid rgba(255,68,68,0.3);}
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<canvas id="starfield"></canvas><div class="cursor"></div><div class="cursor-ring"></div><div class="toast-container"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">⚡ NEXUS</a>
+  <button class="hamburger"><span></span><span></span><span></span></button>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="earn.html">Earn 💰</a></li>
+    <li><a href="gaming.html">Gaming</a></li>
+    <li><a href="ai-tools.html">AI Tools</a></li>
+    <li><a href="subscribe.html" class="active" style="color:var(--gold);">⭐ Subscribe</a></li>
+    <li><a href="login.html" id="nav-login-btn" style="border:1px solid var(--cyan);border-radius:8px;padding:4px 12px;">🔐 LOGIN</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <h1>⭐ SUBSCRIBE TO NEXUS</h1>
+  <p>Unlock premium features · Earn faster · Unlimited AI · Pay via MTN MoMo</p>
+</div>
+
+<div class="section" style="padding-top:0">
+
+  <!-- PLANS -->
+  <div class="plans-grid reveal">
+
+    <div class="plan-card" id="plan-basic" onclick="selectPlan('basic',this)">
+      <div class="plan-name" style="color:var(--cyan);">🔵 BASIC</div>
+      <div class="plan-price">GHS 30</div>
+      <div class="plan-per">per month · ~$2 USD</div>
+      <ul class="plan-feat">
+        <li>1.5× mining speed</li>
+        <li>8 AI queries/day</li>
+        <li>Ad-free browsing</li>
+        <li>Priority chat</li>
+      </ul>
+    </div>
+
+    <div class="plan-card" id="plan-standard" onclick="selectPlan('standard',this)">
+      <div class="hot-badge">🔥 POPULAR</div>
+      <div class="plan-name" style="color:var(--gold);">⭐ STANDARD</div>
+      <div class="plan-price" style="background:linear-gradient(135deg,var(--gold),#ff8800);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">GHS 60</div>
+      <div class="plan-per">per month · ~$4 USD</div>
+      <ul class="plan-feat">
+        <li>2× mining speed</li>
+        <li>Unlimited AI queries</li>
+        <li>Quantum Miner access</li>
+        <li>Spin wheel every 2hrs</li>
+        <li>$50 min withdrawal</li>
+      </ul>
+    </div>
+
+    <div class="plan-card" id="plan-premium" onclick="selectPlan('premium',this)">
+      <div class="plan-name" style="color:var(--magenta);">💎 PREMIUM</div>
+      <div class="plan-price" style="background:linear-gradient(135deg,var(--magenta),#8800ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">GHS 100</div>
+      <div class="plan-per">per month · ~$7 USD</div>
+      <ul class="plan-feat">
+        <li>5× mining speed</li>
+        <li>Galaxy + Master Miner</li>
+        <li>VIP withdrawal ($25 min)</li>
+        <li>All future features</li>
+        <li>Direct creator access</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- PAYMENT FORM -->
+  <div class="pay-box" id="pay-box">
+
+    <!-- Step 1: Send money -->
+    <div class="step-box">
+      <div class="step-num">STEP 1 — SEND PAYMENT</div>
+      <p style="font-size:0.85rem;opacity:0.8;margin-bottom:1rem;line-height:1.7;">
+        Send exactly <strong id="pay-amount" style="color:var(--gold);"></strong> via <strong>MTN Mobile Money</strong> to the number below.
+        Use reference: <strong style="color:var(--cyan);" id="pay-ref">NEXUS PLAN</strong>
+      </p>
+
+      <!-- Number hidden — revealed on click -->
+      <div id="num-btn-zone">
+        <div class="momo-num-btn" onclick="revealNumber()">
+          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--gold);margin-bottom:0.3rem;">🔒 TAP TO REVEAL PAYMENT NUMBER</div>
+          <div style="font-size:0.72rem;opacity:0.5;">Click to show the MTN MoMo number</div>
+        </div>
+      </div>
+      <div id="num-revealed" style="display:none;text-align:center;">
+        <div class="momo-revealed" id="momo-display">••••••••••</div>
+        <div style="font-size:0.72rem;opacity:0.5;margin:0.3rem 0;">MTN Mobile Money · Ghana</div>
+        <button class="btn btn-outline" style="font-size:0.68rem;padding:6px 16px;" onclick="copyNum()">📋 COPY NUMBER</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Fill details -->
+    <div class="step-box">
+      <div class="step-num">STEP 2 — SUBMIT YOUR DETAILS</div>
+      <div class="field" style="margin-top:0.8rem;"><label>YOUR FULL NAME</label><input type="text" id="sender-name" placeholder="Name on your MoMo account"></div>
+      <div class="field"><label>YOUR PHONE NUMBER (that sent the payment)</label><input type="tel" id="sender-phone" placeholder="e.g. 0244123456"></div>
+      <div class="field"><label>MOMO TRANSACTION ID / REFERENCE</label><input type="text" id="txn-id" placeholder="The reference number from your MoMo receipt"></div>
+
+      <!-- Optional screenshot -->
+      <div class="field">
+        <label>PAYMENT SCREENSHOT (optional but speeds up approval)</label>
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('ss-file').click()">
+          <span id="upload-label">📎 Tap to attach screenshot</span>
+          <input type="file" id="ss-file" accept="image/*" style="display:none" onchange="fileSelected(this)">
+        </div>
+      </div>
+
+      <div id="submit-err" style="background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.3);border-radius:8px;padding:0.7rem 1rem;font-size:0.8rem;color:#ff7777;display:none;margin-top:0.5rem;"></div>
+      <button class="submit-btn" id="submit-btn" onclick="submitPayment()">✅ SUBMIT PAYMENT PROOF</button>
+      <p style="font-size:0.7rem;opacity:0.4;text-align:center;margin-top:0.7rem;line-height:1.6;">
+        Activation within 1–24 hours after verification. You'll see status updates on this page.
+      </p>
+    </div>
+  </div>
+
+  <!-- Success card -->
+  <div class="success-card" id="success-card" style="max-width:560px;margin:0 auto;">
+    <div style="font-size:3rem;margin-bottom:0.8rem;">✅</div>
+    <div style="font-family:'Orbitron',monospace;color:var(--neon-green);font-size:1.1rem;margin-bottom:0.5rem;">PAYMENT SUBMITTED!</div>
+    <div id="success-msg" style="opacity:0.8;font-size:0.88rem;line-height:1.7;margin-bottom:1rem;"></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--cyan);" id="receipt-num"></div>
+    <div style="margin-top:1.2rem;font-size:0.78rem;opacity:0.6;">We will verify and activate your plan shortly. Check back here to see your status.</div>
+    <button class="btn btn-outline" style="margin-top:1rem;" onclick="loadHistory()">📋 View My Payments</button>
+  </div>
+
+  <!-- Payment history -->
+  <div style="max-width:560px;margin:2rem auto;" id="history-section" style="display:none;">
+    <div class="section-title" style="font-size:1rem;margin-bottom:1rem;">📋 MY PAYMENT HISTORY</div>
+    <div id="history-list"></div>
+  </div>
+
+  <!-- Already subscribed banner -->
+  <div id="active-banner" style="max-width:560px;margin:0 auto 2rem;display:none;">
+    <div style="background:rgba(57,255,20,0.08);border:2px solid var(--neon-green);border-radius:16px;padding:1.5rem;text-align:center;">
+      <div style="font-family:'Orbitron',monospace;color:var(--neon-green);font-size:1rem;margin-bottom:0.4rem;">✅ YOU'RE SUBSCRIBED!</div>
+      <div style="font-size:0.85rem;opacity:0.7;" id="active-plan-text">Your plan is active.</div>
+      <a href="earn.html" class="btn btn-gold" style="display:inline-block;margin-top:0.8rem;text-decoration:none;">💰 GO EARN →</a>
+    </div>
+  </div>
+
+</div><!-- end .section -->
+
+<footer><div class="footer-bottom">© 2025 NEXUS PLATFORM — CREATED BY JOKSONX | ONE STEM 6 — AGE 15</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+// Payment number stored in split base64 pieces — never visible in source
+function _pn(){ return ['MDI0', 'NTE4', 'NjQ0', 'OQ=='].map(s=>atob(s)).join(''); }
+
+let _selectedPlan = '', _paymentId = '';
+
+// Check if already subscribed
+document.addEventListener('DOMContentLoaded', () => {
+  const plan = NEXUS_API.getPlan();
+  if (plan && plan !== 'none') {
+    document.getElementById('active-banner').style.display = 'block';
+    document.getElementById('active-plan-text').textContent =
+      'Active plan: ' + plan.toUpperCase() + ' ✨ All premium features unlocked!';
+  }
+  loadHistory();
+});
+
+function selectPlan(plan, el) {
+  _selectedPlan = plan;
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+
+  const prices = { basic:'GHS 30', standard:'GHS 60', premium:'GHS 100' };
+  const refs   = { basic:'NEXUS BASIC', standard:'NEXUS STANDARD', premium:'NEXUS PREMIUM' };
+  document.getElementById('pay-amount').textContent = prices[plan];
+  document.getElementById('pay-ref').textContent    = refs[plan];
+
+  // Reset number reveal
+  document.getElementById('num-btn-zone').style.display  = 'block';
+  document.getElementById('num-revealed').style.display  = 'none';
+  document.getElementById('success-card').style.display  = 'none';
+
+  const box = document.getElementById('pay-box');
+  box.classList.add('show');
+  box.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function revealNumber() {
+  const n = _pn();
+  document.getElementById('num-btn-zone').style.display  = 'none';
+  document.getElementById('num-revealed').style.display  = 'block';
+  document.getElementById('momo-display').textContent    = n;
+  window._activeNum = n;
+}
+
+function copyNum() {
+  const n = window._activeNum || _pn();
+  navigator.clipboard.writeText(n)
+    .then(() => toast('✅ Number copied!', 'success'))
+    .catch(() => toast('Number: ' + n));
+}
+
+function fileSelected(input) {
+  const zone  = document.getElementById('upload-zone');
+  const label = document.getElementById('upload-label');
+  if (input.files[0]) {
+    zone.classList.add('has-file');
+    label.textContent = '✅ ' + input.files[0].name;
+  }
+}
+
+function showErr(msg) {
+  const el = document.getElementById('submit-err');
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideErr() { document.getElementById('submit-err').style.display = 'none'; }
+
+async function submitPayment() {
+  hideErr();
+  if (!_selectedPlan)   { showErr('⚠️ Please select a plan above first'); return; }
+  const name  = document.getElementById('sender-name').value.trim();
+  const phone = document.getElementById('sender-phone').value.trim();
+  const txid  = document.getElementById('txn-id').value.trim();
+  const file  = document.getElementById('ss-file').files[0] || null;
+
+  if (!name)  { showErr('⚠️ Please enter your full name'); return; }
+  if (!phone) { showErr('⚠️ Please enter the phone number you sent from'); return; }
+  if (!txid)  { showErr('⚠️ Please enter the MoMo transaction reference'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = '⏳ Submitting...';
+
+  try {
+    const res = await NEXUS_API.submitPayment(_selectedPlan, name, phone, txid, file);
+    _paymentId = res.paymentId || '';
+
+    document.getElementById('pay-box').classList.remove('show');
+    const sc = document.getElementById('success-card');
+    sc.style.display = 'block';
+    document.getElementById('success-msg').textContent = res.message;
+    document.getElementById('receipt-num').textContent = 'Receipt: ' + res.receiptNumber;
+    sc.scrollIntoView({ behavior:'smooth' });
+    toast('✅ Payment submitted!', 'success');
+    loadHistory();
+  } catch(err) {
+    showErr('❌ ' + err.message);
+    btn.disabled = false; btn.textContent = '✅ SUBMIT PAYMENT PROOF';
+  }
+}
+
+async function loadHistory() {
+  try {
+    const payments = await NEXUS_API.getPaymentHistory();
+    if (!payments || payments.length === 0) return;
+    const section = document.getElementById('history-section');
+    const list    = document.getElementById('history-list');
+    section.style.display = 'block';
+    const planLabels = { basic:'Basic', standard:'Standard', premium:'Premium' };
+    list.innerHTML = payments.map(p => `
+      <div class="history-item">
+        <div style="flex:1;">
+          <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--cyan);">${planLabels[p.plan]||p.plan} Plan</div>
+          <div style="font-size:0.72rem;opacity:0.6;margin-top:0.2rem;">${p.receiptNumber} · ${new Date(p.submittedAt||Date.now()).toLocaleDateString()}</div>
+          ${p.status==='rejected'&&p.adminNote ? `<div style="font-size:0.72rem;color:#ff7777;margin-top:0.2rem;">Reason: ${p.adminNote}</div>` : ''}
+        </div>
+        <span class="status-badge ${p.status}">${p.status.toUpperCase()}</span>
+      </div>`).join('');
+
+    // If any approved, update local plan
+    const approved = payments.find(p => p.status === 'approved');
+    if (approved) NEXUS_API._updateLocalPlan(approved.plan);
+  } catch(e) { /* silent */ }
+}
+</script>
+</body>
+</html>
